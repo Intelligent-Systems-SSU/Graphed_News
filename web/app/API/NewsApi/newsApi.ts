@@ -1,4 +1,4 @@
-import { articleType } from './types';
+import { articleBackgroundType, articleType } from './types';
 
 class NewsApi {
   private apiUrl: string;
@@ -19,6 +19,14 @@ class NewsApi {
 
   public async getNewsList() {
     return this.fetchApi('/articles') as Promise<articleType[]>;
+  }
+
+  public async getNewsById(id: string) {
+    return this.fetchApi(`/articles/${id}`) as Promise<articleType>;
+  }
+
+  public async getNewsBackground(id: string) {
+    return this.fetchApi(`/articles/${id}/background`) as Promise<articleBackgroundType[]>;
   }
 }
 

@@ -7,3 +7,10 @@ export interface articleType {
   keywords: string;
   published_date: string;
 }
+
+export interface articleBackgroundType {
+  id: number;
+  article_id: number;
+  topic: string;
+  content: string;
+}
