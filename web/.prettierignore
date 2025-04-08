@@ -1,0 +1,13 @@
+dist
+build-*
+node_modules
+.swc
+.vscode
+.DS_Store
+.env*
+*.json
+*.log
+*.md
+*.yaml
+*.yml
+pnpm-lock.yaml
