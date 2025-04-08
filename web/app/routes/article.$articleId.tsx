@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
+import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare';
 import { Await, useLoaderData } from '@remix-run/react';
 import { Suspense } from 'react';
 import { newsApi } from 'app/API/NewsApi/newsApi';
