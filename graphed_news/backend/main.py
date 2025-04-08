@@ -4,12 +4,35 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+from fastapi.openapi.utils import get_openapi
+from fastapi.staticfiles import StaticFiles
+import re
 
-# FastAPI 앱 생성 시 docs_url과 redoc_url 명시
+# FastAPI 앱 생성 시 한국어 메타데이터 설정
 app = FastAPI(
+    title="Graphed News API",
+    description="뉴스 기사와 관련 정보를 제공하는 API",
+    version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
 )
+
+# 한국어 OpenAPI 스키마 커스터마이징
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    
+    openapi_schema = get_openapi(
+        title="Graphed News API",
+        version="1.0.0",
+        description="뉴스 기사와 관련 정보를 제공하는 API",
+        routes=app.routes,
+    )
+    
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
 
 # CORS 미들웨어 추가
 app.add_middleware(
@@ -20,11 +43,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 한글 인코딩을 위한 커스텀 미들웨어
+# 문서 경로 패턴
+docs_url_pattern = re.compile(r'^/docs|^/redoc|^/openapi\.json')
+
+# 미들웨어를 더 정교하게 개선
 @app.middleware("http")
-async def add_charset_middleware(request, call_next):
+async def content_type_middleware(request, call_next):
+    path = request.url.path
     response = await call_next(request)
-    response.headers["Content-Type"] = "application/json; charset=utf-8"
+    
+    # API 문서 관련 경로는 처리하지 않음
+    if docs_url_pattern.match(path) or path.startswith("/static"):
+        return response
+        
+    # 나머지 경로는 JSON으로 처리
+    if "Content-Type" not in response.headers or "text/html" not in response.headers["Content-Type"]:
+        response.headers["Content-Type"] = "application/json; charset=utf-8"
+    
     return response
 
 # 응답 처리를 위한 커스텀 함수
@@ -217,14 +252,28 @@ def get_article_with_all_info(article_id: int):
 
 if __name__ == "__main__":
     import uvicorn
+    import sys
+    
+    # 현재 파일 경로와 디렉토리 정보 출력
+    print(f"현재 실행 파일: {__file__}")
+    print(f"현재 작업 디렉토리: {os.getcwd()}")
+    
     # UTF-8 환경 보장
     os.environ["LANG"] = "C.UTF-8"
     os.environ["LC_ALL"] = "C.UTF-8"
+    
+    # 명시적으로 호스트와 포트를 지정
+    host = "0.0.0.0"
+    port = 8501
+    
+    print(f"서버 시작: http://{host}:{port}")
+    print(f"API 문서: http://{host}:{port}/docs")
+    print(f"ReDoc 문서: http://{host}:{port}/redoc")
+    
+    # 직접 app 객체 전달 방식으로 변경
     uvicorn.run(
-        app, 
-        host="0.0.0.0", 
-        port=8501, 
-        reload=True, 
-        log_level="info", 
-        workers=1
+        app,  # 모듈 경로 대신 직접 app 객체 전달
+        host=host, 
+        port=port, 
+        log_level="info"
     )
