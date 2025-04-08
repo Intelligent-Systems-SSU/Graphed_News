@@ -1,0 +1,39 @@
+name: DeployApp
+
+on:
+  push:
+    branches: [main]
+
+run-name: "Deploy Web App"
+
+jobs:
+  Deploy:
+    concurrency:
+      group: project-alpha-deploy
+      cancel-in-progress: true
+    environment: production
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./graphed_news
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v4
+
+      - uses: pnpm/action-setup@v3
+
+      - name: Install dependencies
+        run: |
+          pnpm install
+        working-directory: ${{ env.working-directory }}
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          packageManager: pnpm
+          preCommands: pnpm build
+          command: pages deploy
+          workingDirectory: ${{ env.working-directory }}
