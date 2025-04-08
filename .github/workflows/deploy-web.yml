@@ -11,22 +11,24 @@ jobs:
     concurrency:
       group: project-alpha-deploy
       cancel-in-progress: true
-    environment: production
     runs-on: ubuntu-latest
     env:
-      working-directory: ./graphed_news
+      working-directory: ./web
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
       - uses: actions/setup-node@v4
 
-      - uses: pnpm/action-setup@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          package_json_file: ./web/package.json
 
       - name: Install dependencies
+        working-directory: ${{ env.working-directory }}
         run: |
           pnpm install
-        working-directory: ${{ env.working-directory }}
 
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
