@@ -1,0 +1,10 @@
+message NewsSummaryParams {
+	required string url = 1;
+}
+message NewsSummaryResponse {
+	required string summary = 1;
+}
+
+service NewsSummary {
+	rpc get(NewsSummaryParams) returns (NewsSummaryResponse) {}
+}

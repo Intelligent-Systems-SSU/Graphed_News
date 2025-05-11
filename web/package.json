@@ -13,12 +13,16 @@
     "format": "prettier --ignore-path .prettierignore --check .",
     "typegen": "wrangler types",
     "preview": "pnpm run build && wrangler pages dev",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "proto:generate": "mkdir -p app/generated && protoc -I=../protos --ts_out=./app/generated ../protos/*.proto"
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.13.3",
+    "@grpc/proto-loader": "^0.7.15",
     "@remix-run/cloudflare": "^2.15.3",
     "@remix-run/cloudflare-pages": "^2.15.3",
     "@remix-run/react": "^2.15.3",
+    "google-protobuf": "^3.21.4",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -37,10 +41,12 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "grpc-tools": "^1.13.0",
     "postcss": "^8.4.38",
     "prettier": "^3.5.3",
+    "protoc-gen-ts": "^0.8.7",
     "tailwindcss": "^3.4.4",
-    "typescript": "^5.1.6",
+    "typescript": "^5.8.3",
     "vite": "^6.0.0",
     "vite-tsconfig-paths": "^4.2.1",
     "wrangler": "4.8.0"

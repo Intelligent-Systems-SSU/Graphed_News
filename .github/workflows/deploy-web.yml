@@ -3,6 +3,7 @@ name: DeployApp
 on:
   push:
     branches: [main]
+  pull_request:
 
 run-name: "Deploy Web App"
 
@@ -37,5 +38,5 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           packageManager: pnpm
           preCommands: pnpm build
-          command: pages deploy
+          command: "pages deploy"
           workingDirectory: ${{ env.working-directory }}
