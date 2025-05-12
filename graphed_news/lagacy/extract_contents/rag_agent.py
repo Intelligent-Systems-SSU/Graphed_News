@@ -105,7 +105,9 @@ class NewsContextAgent:
         [Continue for all identified concepts]
         
         ## How This Context Helps Understand the News
-        [Explain how this background information helps the reader better understand the significance and implications of the news article]        
+        [Explain how this background information helps the reader better understand the significance and implications of the news article]  
+
+        final answer is must be in Korean      
         """
         
         # Using a slightly higher temperature to encourage more exploratory, detailed responses
