@@ -1,8 +1,10 @@
+syntax = "proto3";
+
 message NewsSummaryParams {
-	required string url = 1;
+	string url = 1;
 }
 message NewsSummaryResponse {
-	required string summary = 1;
+	string summary = 1;
 }
 
 service NewsSummary {
