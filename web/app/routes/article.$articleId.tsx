@@ -2,7 +2,7 @@ import type { MetaFunction } from '@remix-run/cloudflare';
 import { Await, Link, useLoaderData } from '@remix-run/react';
 import { Suspense } from 'react';
 import createLoader from 'app/utils/createLoader';
-import { News } from '@prisma/client';
+import { News, NewsSummary } from '@prisma/client';
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Article' }, { name: 'description', content: 'Welcome to Remix!' }];
@@ -13,24 +13,27 @@ export const loader = createLoader(async ({ params, db }) => {
     throw new Error('Article ID is required');
   }
 
-  const data = await db.news.findUnique({ where: { id: Number(params.articleId) } });
+  const news = await db.news.findUnique({ where: { id: Number(params.articleId) } });
+  const summary = await db.newsSummary.findUnique({ where: { newsId: Number(params.articleId) } });
 
-  return { data };
+  return { news, summary };
 });
 
 export default function Show() {
-  const { data } = useLoaderData<typeof loader>();
+  const { news, summary } = useLoaderData<typeof loader>();
 
   return (
     <div className="flex p-4 max-w-4xl mt-8 mx-auto">
       <Suspense fallback={<div>Loading...</div>}>
-        <Await resolve={data}>{(news) => (news ? <NewsWrapper news={news} /> : <div>Article not found</div>)}</Await>
+        <Await resolve={news}>
+          {(news) => (news ? <NewsWrapper news={news} summary={summary} /> : <div>Article not found</div>)}
+        </Await>
       </Suspense>
     </div>
   );
 }
 
-const NewsWrapper = ({ news }: { news: News }) => {
+const NewsWrapper = ({ news, summary }: { news: News; summary: NewsSummary | null }) => {
   return (
     <div className="w-full">
       <Link to="/article" className="text-blue-500 hover:underline">
@@ -51,7 +54,7 @@ const NewsWrapper = ({ news }: { news: News }) => {
       </div>
       <div className="mt-4 flex w-auto">
         <p className="grow-3">{news.content}</p>
-        <p className="grow-1">blablabla</p>
+        <p className="grow-1">{summary?.summary}</p>
       </div>
     </div>
   );
