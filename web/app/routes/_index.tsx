@@ -7,7 +7,7 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
   return (
-    <div className="flex h-screen items-center justify-center">
+    <div className="flex p-4 max-w-4xl mt-8 mx-auto">
       <Link to="/article" className="text-blue-500 hover:underline">
         기사 리스트
       </Link>

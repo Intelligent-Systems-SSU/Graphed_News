@@ -16,7 +16,7 @@ export default function Index() {
   const { data } = useLoaderData<typeof loader>();
 
   return (
-    <div className="flex flex-col h-screen items-center justify-center p-20">
+    <div className="flex p-4 max-w-4xl mt-8 mx-auto">
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={data}>
           {(resolvedData) =>
@@ -25,7 +25,10 @@ export default function Index() {
                 <Link to={`/article/${item.id}`} className="text-blue-500 hover:underline">
                   <h2 className="text-xl font-bold">{item.title}</h2>
                 </Link>
-                <p>{item.content}</p>
+                <p>
+                  {item.content.slice(0, 200)}
+                  {item.content.length > 200 && '...'}
+                </p>
                 <a href={item.url} target="_blank" rel="noopener noreferrer">
                   Read more
                 </a>
