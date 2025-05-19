@@ -32,7 +32,7 @@ export default function Show() {
 
 const NewsWrapper = ({ news }: { news: News }) => {
   return (
-    <div>
+    <div className="w-full">
       <Link to="/article" className="text-blue-500 hover:underline">
         {'⬅️ 리스트로'}
       </Link>
@@ -49,7 +49,10 @@ const NewsWrapper = ({ news }: { news: News }) => {
           Read original
         </a>
       </div>
-      <p className="mt-4">{news.content}</p>
+      <div className="mt-4 flex w-auto">
+        <p className="grow-3">{news.content}</p>
+        <p className="grow-1">blablabla</p>
+      </div>
     </div>
   );
 };
