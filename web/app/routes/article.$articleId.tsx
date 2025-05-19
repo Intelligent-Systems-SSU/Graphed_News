@@ -22,7 +22,7 @@ export default function Show() {
   const { data } = useLoaderData<typeof loader>();
 
   return (
-    <div className="flex h-screen p-20 max-w-4xl mx-auto">
+    <div className="flex p-4 max-w-4xl mt-8 mx-auto">
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={data}>{(news) => (news ? <NewsWrapper news={news} /> : <div>Article not found</div>)}</Await>
       </Suspense>

@@ -16,7 +16,7 @@ export default function Index() {
   const { data } = useLoaderData<typeof loader>();
 
   return (
-    <div className="flex flex-col h-screen items-center justify-center p-20">
+    <div className="flex p-4 max-w-4xl mt-8 mx-auto">
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={data}>
           {(resolvedData) =>
