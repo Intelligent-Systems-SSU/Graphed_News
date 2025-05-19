@@ -1,6 +1,7 @@
 import type { MetaFunction } from '@remix-run/cloudflare';
 import { Await, useLoaderData } from '@remix-run/react';
 import { getSummary } from 'app/API/AI/AI';
+import createAction from 'app/utils/createAction';
 import createLoader from 'app/utils/createLoader';
 import { Suspense } from 'react';
 
@@ -10,7 +11,6 @@ export const meta: MetaFunction = () => {
 
 export const loader = createLoader(async ({ db }) => {
   const summary = getSummary().catch((error) => {
-    console.error('Error while fetching summary:', error);
     return 'Error while fetching summary';
   });
 
@@ -20,6 +20,11 @@ export const loader = createLoader(async ({ db }) => {
     summary,
     test,
   };
+});
+
+export const action = createAction(async ({ db }) => {
+  console.log('test');
+  return null;
 });
 
 export default function Index() {
@@ -32,6 +37,9 @@ export default function Index() {
         <Await resolve={summary}>{(summary) => <p>{summary}</p>}</Await>
       </Suspense>
       <p>{test?.name}</p>
+      <form method="post">
+        <button type="submit">테스트</button>
+      </form>
     </div>
   );
 }
