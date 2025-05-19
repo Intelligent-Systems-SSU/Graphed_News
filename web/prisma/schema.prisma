@@ -31,17 +31,17 @@ model Test {
 }
 
 model News {
-  id           Int           @id @default(autoincrement())
-  url          String
-  title        String
-  content      String
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  newsSummmary NewsSummmary?
-  newsKeyword  NewsKeyword[]
+  id          Int           @id @default(autoincrement())
+  url         String
+  title       String
+  content     String
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  newsSummary NewsSummary?
+  newsKeyword NewsKeyword[]
 }
 
-model NewsSummmary {
+model NewsSummary {
   id      Int    @id @default(autoincrement())
   news    News   @relation(fields: [newsId], references: [id])
   newsId  Int    @unique

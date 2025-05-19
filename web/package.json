@@ -16,7 +16,7 @@
     "cf-typegen": "wrangler types",
     "proto:generate": "mkdir -p app/generated && protoc -I=../protos --ts_out=./app/generated ../protos/*.proto",
     "create-migration": "npx wrangler d1 migrations create graphed-news-db",
-    "diff-migration": "npx prisma migrate diff --from-empty --to-schema-datamodel ./prisma/schema.prisma --script --output ",
+    "diff-migration": "npx prisma migrate diff --from-local-d1 --to-schema-datamodel ./prisma/schema.prisma --script --output ",
     "run-migration": "npx wrangler d1 migrations apply graphed-news-db"
   },
   "dependencies": {
