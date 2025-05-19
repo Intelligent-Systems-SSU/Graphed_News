@@ -14,11 +14,16 @@
     "typegen": "wrangler types",
     "preview": "pnpm run build && wrangler pages dev",
     "cf-typegen": "wrangler types",
-    "proto:generate": "mkdir -p app/generated && protoc -I=../protos --ts_out=./app/generated ../protos/*.proto"
+    "proto:generate": "mkdir -p app/generated && protoc -I=../protos --ts_out=./app/generated ../protos/*.proto",
+    "create-migration": "npx wrangler d1 migrations create graphed-news-db",
+    "diff-migration": "npx prisma migrate diff --from-empty --to-schema-datamodel ./prisma/schema.prisma --script --output ",
+    "run-migration": "npx wrangler d1 migrations apply graphed-news-db"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.13.3",
     "@grpc/proto-loader": "^0.7.15",
+    "@prisma/adapter-d1": "^6.2.1",
+    "@prisma/client": "^6.2.1",
     "@remix-run/cloudflare": "^2.15.3",
     "@remix-run/cloudflare-pages": "^2.15.3",
     "@remix-run/react": "^2.15.3",
@@ -44,6 +49,7 @@
     "grpc-tools": "^1.13.0",
     "postcss": "^8.4.38",
     "prettier": "^3.5.3",
+    "prisma": "^6.2.1",
     "protoc-gen-ts": "^0.8.7",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.8.3",
