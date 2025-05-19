@@ -37,7 +37,7 @@ const NewsWrapper = ({ news }: { news: News }) => {
         {'⬅️ 리스트로'}
       </Link>
       <h1 className="text-3xl font-bold">{news.title}</h1>
-      <div className="flex items-center gap-2 mt-1">
+      <div className="flex items-center gap-2 mt-1 md:mt-3">
         <p className="text-gray-500 text-sm">
           {news.createdAt.toLocaleDateString('ko-KR', {
             year: 'numeric',

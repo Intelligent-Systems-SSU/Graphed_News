@@ -25,7 +25,10 @@ export default function Index() {
                 <Link to={`/article/${item.id}`} className="text-blue-500 hover:underline">
                   <h2 className="text-xl font-bold">{item.title}</h2>
                 </Link>
-                <p>{item.content}</p>
+                <p>
+                  {item.content.slice(0, 200)}
+                  {item.content.length > 200 && '...'}
+                </p>
                 <a href={item.url} target="_blank" rel="noopener noreferrer">
                   Read more
                 </a>
