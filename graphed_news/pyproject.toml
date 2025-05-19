@@ -6,6 +6,9 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "crawl4ai>=0.6.2",
+    "google>=3.0.0",
+    "grpcio>=1.71.0",
+    "grpcio-tools>=1.71.0",
     "ipykernel>=6.29.5",
     "langchain>=0.3.25",
     "langchain-community>=0.3.24",
@@ -13,4 +16,5 @@ dependencies = [
     "langchain-openai>=0.3.16",
     "langgraph>=0.4.3",
     "playwright>=1.52.0",
+    "protobuf>=5.29.4",
 ]
