@@ -44,3 +44,31 @@ jobs:
           preCommands: pnpm build
           command: "pages deploy"
           workingDirectory: ${{ env.working-directory }}
+
+      - name: Extract Preview URL
+        id: extract_url
+        run: |
+          echo "DEPLOY_URL=$(grep -o 'https://[^ ]*\.pages\.dev' <<< "${{ steps.deploy.outputs.stdout }}")" >> $GITHUB_ENV
+
+      - name: Update PR Description with Deploy Link
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number
+            });
+            const body = pr.data.body || "";
+            const url = process.env.DEPLOY_URL;
+            if (url && !body.includes(url)) {
+              const newBody = `${body}\n\n---\n🔗 [Cloudflare Pages Preview](${url})`;
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                body: newBody
+              });
+            }
