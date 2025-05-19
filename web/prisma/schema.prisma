@@ -29,3 +29,29 @@ model Test {
 
   @@map("tests")
 }
+
+model News {
+  id           Int           @id @default(autoincrement())
+  url          String
+  title        String
+  content      String
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  newsSummmary NewsSummmary?
+  newsKeyword  NewsKeyword[]
+}
+
+model NewsSummmary {
+  id      Int    @id @default(autoincrement())
+  news    News   @relation(fields: [newsId], references: [id])
+  newsId  Int    @unique
+  summary String
+}
+
+model NewsKeyword {
+  id          Int    @id @default(autoincrement())
+  news        News   @relation(fields: [newsId], references: [id])
+  newsId      Int    @unique
+  keyword     String
+  description String
+}
