@@ -1,11 +1,16 @@
 import type { MetaFunction } from '@remix-run/cloudflare';
 import { Await, Link, useLoaderData } from '@remix-run/react';
 import { Suspense } from 'react';
-import { newsApi } from 'app/API/NewsApi/newsApi';
+import createLoader from 'app/utils/createLoader';
 
 export const meta: MetaFunction = () => {
   return [{ title: 'New Remix App' }, { name: 'description', content: 'Welcome to Remix!' }];
 };
+
+export const loader = createLoader(async ({ db }) => {
+  const data = await db.news.findMany({ take: 10 });
+  return { data };
+});
 
 export default function Index() {
   const { data } = useLoaderData<typeof loader>();
@@ -32,8 +37,3 @@ export default function Index() {
     </div>
   );
 }
-
-export const loader = async () => {
-  const data = newsApi.getNewsList();
-  return { data };
-};
