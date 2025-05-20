@@ -10,8 +10,14 @@ type NewsWithStringDate = Omit<News, 'createdAt'> & {
   createdAt: string;
 };
 
-export const meta: MetaFunction = () => {
-  return [{ title: 'Article' }, { name: 'description', content: 'Welcome to Remix!' }];
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [
+    { title: data?.news?.title || 'Article' },
+    {
+      name: 'description',
+      content: data?.news?.content.replace(/<\/?[^>]+(>|$)/g, '').slice(0, 70) || '기사 요약을 확인해보세요.',
+    },
+  ];
 };
 
 const loadSummary = async (db: ReturnType<typeof getPrismaClient>, articleId: string) => {
