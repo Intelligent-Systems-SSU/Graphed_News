@@ -1,6 +1,5 @@
 import type { MetaFunction } from '@remix-run/cloudflare';
-import { Await, Link, useLoaderData } from '@remix-run/react';
-import { Suspense } from 'react';
+import { Link, useLoaderData } from '@remix-run/react';
 import createLoader from 'app/utils/createLoader';
 import { News, NewsSummary } from '@prisma/client';
 
@@ -20,15 +19,12 @@ export const loader = createLoader(async ({ params, db }) => {
 });
 
 export default function Show() {
-  const { news, summary } = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
+  const { news, summary } = data;
 
   return (
     <div className="flex p-4 max-w-4xl mt-8 mx-auto">
-      <Suspense fallback={<div>Loading...</div>}>
-        <Await resolve={news}>
-          {(news) => (news ? <NewsWrapper news={news} summary={summary} /> : <div>Article not found</div>)}
-        </Await>
-      </Suspense>
+      {news ? <NewsWrapper news={news} summary={summary} /> : <div>Article not found</div>}
     </div>
   );
 }
@@ -56,7 +52,7 @@ const NewsWrapper = ({ news, summary }: { news: News; summary: NewsSummary | nul
         <p className="w-full md:w-2/3">{news.content}</p>
         <div className="w-full md:w-1/3 bg-gray-50 p-4 rounded-lg">
           <h3 className="font-bold mb-2">요약</h3>
-          <p className="text-sm text-gray-700 break-words">{summary?.summary || '요약이 없습니다.'}</p>
+          <p className="text-sm text-gray-700 break-words">{summary?.summary ?? '요약이 없습니다.'}</p>
         </div>
       </div>
     </div>
