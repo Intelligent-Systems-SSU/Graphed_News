@@ -5,7 +5,7 @@ import createLoader from 'app/utils/createLoader';
 import ExternalLinkIcon from 'app/components/ExternalLinkIcon';
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'New Remix App' }, { name: 'description', content: 'Welcome to Remix!' }];
+  return [{ title: '기사 리스트' }, { name: 'description', content: 'AI로 요약된 기사를 확인해보세요.' }];
 };
 
 export const loader = createLoader(async ({ db }) => {
