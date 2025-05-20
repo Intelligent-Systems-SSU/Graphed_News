@@ -52,9 +52,12 @@ const NewsWrapper = ({ news, summary }: { news: News; summary: NewsSummary | nul
           Read original
         </a>
       </div>
-      <div className="mt-4 flex w-auto">
-        <p className="grow-3">{news.content}</p>
-        <p className="grow-1">{summary?.summary}</p>
+      <div className="mt-4 flex flex-col md:flex-row w-full gap-4">
+        <p className="w-full md:w-2/3">{news.content}</p>
+        <div className="w-full md:w-1/3 bg-gray-50 p-4 rounded-lg">
+          <h3 className="font-bold mb-2">요약</h3>
+          <p className="text-sm text-gray-700 break-words">{summary?.summary || '요약이 없습니다.'}</p>
+        </div>
       </div>
     </div>
   );
