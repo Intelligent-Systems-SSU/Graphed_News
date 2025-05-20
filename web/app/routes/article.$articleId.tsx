@@ -55,13 +55,16 @@ const NewsWrapper = ({ news, summary }: { news: News; summary: Promise<NewsSumma
         </a>
       </div>
       <div className="mt-4 flex flex-col md:flex-row w-full gap-4">
-        <p className="w-full md:w-2/3">{news.content}</p>
+        <p className="w-full md:w-2/3" dangerouslySetInnerHTML={{ __html: news.content }} />
         <div className="w-full md:w-1/3 bg-gray-50 p-4 rounded-lg">
           <h3 className="font-bold mb-2">요약</h3>
           <Suspense fallback={<p>불러오는 중...</p>}>
             <Await resolve={summary}>
               {(summary) => (
-                <p className="text-sm text-gray-700 break-words">{summary?.summary ?? '요약이 없습니다.'}</p>
+                <p
+                  className="text-sm text-gray-700 break-words"
+                  dangerouslySetInnerHTML={{ __html: summary?.summary ?? '요약이 없습니다.' }}
+                />
               )}
             </Await>
           </Suspense>
