@@ -1,10 +1,16 @@
 import type { MetaFunction } from '@remix-run/cloudflare';
-import { Link, useLoaderData } from '@remix-run/react';
+import { Suspense } from 'react';
+import { Link, Await, useLoaderData } from '@remix-run/react';
 import createLoader from 'app/utils/createLoader';
 import { News, NewsSummary } from '@prisma/client';
+import { getPrismaClient } from 'app/utils/prisma';
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Article' }, { name: 'description', content: 'Welcome to Remix!' }];
+};
+
+const loadSummary = async (db: ReturnType<typeof getPrismaClient>, articleId: string) => {
+  return await db.newsSummary.findUnique({ where: { newsId: Number(articleId) } });
 };
 
 export const loader = createLoader(async ({ params, db }) => {
@@ -13,7 +19,7 @@ export const loader = createLoader(async ({ params, db }) => {
   }
 
   const news = await db.news.findUnique({ where: { id: Number(params.articleId) } });
-  const summary = await db.newsSummary.findUnique({ where: { newsId: Number(params.articleId) } });
+  const summary = loadSummary(db, params.articleId);
 
   return { news, summary };
 });
@@ -29,7 +35,7 @@ export default function Show() {
   );
 }
 
-const NewsWrapper = ({ news, summary }: { news: News; summary: NewsSummary | null }) => {
+const NewsWrapper = ({ news, summary }: { news: News; summary: Promise<NewsSummary | null> }) => {
   return (
     <div className="w-full">
       <Link to="/article" className="text-blue-500 hover:underline">
@@ -52,7 +58,13 @@ const NewsWrapper = ({ news, summary }: { news: News; summary: NewsSummary | nul
         <p className="w-full md:w-2/3">{news.content}</p>
         <div className="w-full md:w-1/3 bg-gray-50 p-4 rounded-lg">
           <h3 className="font-bold mb-2">요약</h3>
-          <p className="text-sm text-gray-700 break-words">{summary?.summary ?? '요약이 없습니다.'}</p>
+          <Suspense fallback={<p>불러오는 중...</p>}>
+            <Await resolve={summary}>
+              {(summary) => (
+                <p className="text-sm text-gray-700 break-words">{summary?.summary ?? '요약이 없습니다.'}</p>
+              )}
+            </Await>
+          </Suspense>
         </div>
       </div>
     </div>
