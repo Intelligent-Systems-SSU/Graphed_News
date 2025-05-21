@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from . import newsSummary_pb2 as newsSummary__pb2
+from . import NewsSummary_pb2 as NewsSummary__pb2
 
 GRPC_GENERATED_VERSION = '1.71.0'
 GRPC_VERSION = grpc.__version__
@@ -36,8 +36,8 @@ class NewsSummaryStub(object):
         """
         self.get = channel.unary_unary(
                 '/NewsSummary/get',
-                request_serializer=newsSummary__pb2.NewsSummaryParams.SerializeToString,
-                response_deserializer=newsSummary__pb2.NewsSummaryResult.FromString,
+                request_serializer=NewsSummary__pb2.NewsSummaryParams.SerializeToString,
+                response_deserializer=NewsSummary__pb2.NewsSummaryResult.FromString,
                 _registered_method=True)
 
 
@@ -55,8 +55,8 @@ def add_NewsSummaryServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'get': grpc.unary_unary_rpc_method_handler(
                     servicer.get,
-                    request_deserializer=newsSummary__pb2.NewsSummaryParams.FromString,
-                    response_serializer=newsSummary__pb2.NewsSummaryResult.SerializeToString,
+                    request_deserializer=NewsSummary__pb2.NewsSummaryParams.FromString,
+                    response_serializer=NewsSummary__pb2.NewsSummaryResult.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -84,8 +84,8 @@ class NewsSummary(object):
             request,
             target,
             '/NewsSummary/get',
-            newsSummary__pb2.NewsSummaryParams.SerializeToString,
-            newsSummary__pb2.NewsSummaryResult.FromString,
+            NewsSummary__pb2.NewsSummaryParams.SerializeToString,
+            NewsSummary__pb2.NewsSummaryResult.FromString,
             options,
             channel_credentials,
             insecure,
