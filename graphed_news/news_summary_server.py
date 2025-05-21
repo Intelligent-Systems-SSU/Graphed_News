@@ -1,12 +1,14 @@
 """
 뉴스 요약 gRPC 서버 모듈
 """
+from asyncio import sleep
 import grpc
 import asyncio
 from concurrent import futures
 import sys
 import os
 import threading
+import httpx
 
 # 현재 디렉토리를 시스템 경로에 추가
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -42,12 +44,13 @@ class NewsSummaryServicer(NewsSummary_pb2_grpc.NewsSummaryServicer):
         Returns:
             NewsSummaryResult: 요약 결과
         """
+        newsId = request.newsId
         url = request.url
         print(f"요청 받음: URL={url}")
         
         try:
             loop.call_soon_threadsafe(
-                lambda: asyncio.create_task(process_news_article(url)).add_done_callback(self.on_done)
+                lambda: asyncio.create_task(process_news_article(url)).add_done_callback(lambda future: self.on_done(future, newsId))
             )
 
             return NewsSummary_pb2.NewsSummaryResult()
@@ -57,12 +60,21 @@ class NewsSummaryServicer(NewsSummary_pb2_grpc.NewsSummaryServicer):
             context.set_details(f"처리 중 오류 발생: {str(e)}")
             return NewsSummary_pb2.NewsSummaryResult(success=False)
 
-    def on_done(self, future):
+    def on_done(self, future, newsId):
         try:
-            result = future.result()
-            print(f"처리 완료: {result}")
+            res = httpx.post(f'https://graphed-news.pages.dev/ai',
+            json={
+                'newsId': newsId,
+                'summary': future.result()
+            })
+
+            if res.status_code != 200:
+                raise Exception(f"요약 요청 실패: {res.status_code}")
+
+            print(f"요약 완료: {newsId}, 요약: {future.result()}")
         except Exception as e:
             print(f"오류 발생: {str(e)}")
+        
 
 
 def serve():

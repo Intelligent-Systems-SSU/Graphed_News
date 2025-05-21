@@ -1,11 +1,13 @@
 import createAction from 'app/utils/createAction';
 
 export const action = createAction(async ({ db, request }) => {
-  const formData = await request.formData();
-  const newsId = formData.get('newsId') as string;
-  const summary = formData.get('summary') as string;
+  const data = (await request.json()) as { newsId: string; summary: string };
+  const newsId = Number(data.newsId);
+  const summary = data.summary;
 
-  const news = await db.news.findUnique({ where: { id: Number(newsId) } });
+  console.log(newsId, summary);
+
+  const news = await db.news.findUnique({ where: { id: newsId } });
 
   if (!news) {
     throw new Error('News not found');
