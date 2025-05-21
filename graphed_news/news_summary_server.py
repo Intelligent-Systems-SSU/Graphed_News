@@ -6,20 +6,31 @@ import asyncio
 from concurrent import futures
 import sys
 import os
+import threading
 
 # 현재 디렉토리를 시스템 경로에 추가
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
 
 # gRPC 관련 모듈 import
-from generated import NewsSummary_pb2
-from generated import NewsSummary_pb2_grpc
+from generated import newsSummary_pb2 as NewsSummary_pb2
+from generated import newsSummary_pb2_grpc as NewsSummary_pb2_grpc
 
 # main 모듈에서 process_news_article 함수 import
 from main import process_news_article
 
 
+loop = asyncio.new_event_loop()
+
+def start_loop(loop):
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
+# 백그라운드 스레드에서 이벤트 루프 실행
+threading.Thread(target=start_loop, args=(loop,), daemon=True).start()
+
 class NewsSummaryServicer(NewsSummary_pb2_grpc.NewsSummaryServicer):
+
     def get(self, request, context):
         """
         gRPC 요청을 처리하는 함수
@@ -29,33 +40,29 @@ class NewsSummaryServicer(NewsSummary_pb2_grpc.NewsSummaryServicer):
             context: gRPC 컨텍스트
             
         Returns:
-            NewsSummaryResponse: 요약 결과
+            NewsSummaryResult: 요약 결과
         """
         url = request.url
         print(f"요청 받음: URL={url}")
         
         try:
-            # 비동기 함수를 동기적으로 실행하기 위한 새 이벤트 루프 생성
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            
-            # 비동기 함수 실행
-            result = loop.run_until_complete(process_news_article(url))
-            
-            # 이벤트 루프 닫기
-            loop.close()
-            
-            # 처리 결과에서 final_summary 추출
-            final_summary = result.get('final_summary', '요약 정보를 찾을 수 없습니다.')
-            print(f"처리 완료: {url}")
-            
-            # 응답 생성
-            return NewsSummary_pb2.NewsSummaryResponse(summary=final_summary)
+            loop.call_soon_threadsafe(
+                lambda: asyncio.create_task(process_news_article(url)).add_done_callback(self.on_done)
+            )
+
+            return NewsSummary_pb2.NewsSummaryResult()
         except Exception as e:
             print(f"오류 발생: {str(e)}")
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(f"처리 중 오류 발생: {str(e)}")
-            return NewsSummary_pb2.NewsSummaryResponse(summary=f"오류: {str(e)}")
+            return NewsSummary_pb2.NewsSummaryResult(success=False)
+
+    def on_done(self, future):
+        try:
+            result = future.result()
+            print(f"처리 완료: {result}")
+        except Exception as e:
+            print(f"오류 발생: {str(e)}")
 
 
 def serve():
