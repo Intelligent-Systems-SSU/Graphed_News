@@ -26,6 +26,11 @@ jobs:
         with:
           package_json_file: ./web/package.json
 
+      - name: env
+        working-directory: ${{ env.working-directory }}
+        run: |
+          echo "${{ secrets.ENV_FILE }}" >> .env
+
       - name: Install dependencies
         working-directory: ${{ env.working-directory }}
         run: |
