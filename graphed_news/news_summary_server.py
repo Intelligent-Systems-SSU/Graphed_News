@@ -13,8 +13,8 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
 
 # gRPC 관련 모듈 import
-from generated import newsSummary_pb2 as NewsSummary_pb2
-from generated import newsSummary_pb2_grpc as NewsSummary_pb2_grpc
+from generated import NewsSummary_pb2
+from generated import NewsSummary_pb2_grpc
 
 # main 모듈에서 process_news_article 함수 import
 from main import process_news_article
