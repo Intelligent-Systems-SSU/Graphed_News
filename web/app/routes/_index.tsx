@@ -46,9 +46,15 @@ export default function Index() {
             <Link to="/article" className="bg-black text-white py-3 px-6 rounded-full text-lg hover:bg-gray-800">
               시작하기
             </Link>
-            <a href="#features" className="bg-white text-gray-800 py-3 px-6 rounded-full text-lg hover:bg-gray-100">
+            <button
+              onClick={() => {
+                const section = document.getElementById('features');
+                section?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="bg-white text-gray-800 py-3 px-6 rounded-full text-lg hover:bg-gray-100"
+            >
               자세히 보기
-            </a>
+            </button>
           </div>
         </div>
       </section>
