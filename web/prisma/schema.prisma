@@ -55,3 +55,23 @@ model NewsKeyword {
   keyword     String
   description String
 }
+
+model ABTest {
+  id             Int         @id @default(autoincrement())
+  name           String
+  problem1       String
+  problem2       String
+  problem3       String
+  problem1Answer Int
+  problem2Answer Int
+  problem3Answer Int
+  TestSolve      TestSolve[]
+}
+
+model TestSolve {
+  id     Int    @id @default(autoincrement())
+  test   ABTest @relation(fields: [testId], references: [id])
+  testId Int
+  name   String
+  time   Float
+}
