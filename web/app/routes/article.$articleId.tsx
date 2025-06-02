@@ -1,10 +1,13 @@
 import type { MetaFunction } from '@remix-run/cloudflare';
 import { Suspense } from 'react';
 import { Link, Await, useLoaderData } from '@remix-run/react';
+import ReactMarkdown from 'react-markdown';
 import createLoader from 'app/utils/createLoader';
 import { News, NewsSummary } from '@prisma/client';
 import { getPrismaClient } from 'app/utils/prisma';
 import ExternalLinkIcon from 'app/components/ExternalLinkIcon';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 
 type NewsWithStringDate = Omit<News, 'createdAt'> & {
   createdAt: string;
@@ -98,15 +101,18 @@ const NewsWrapper = ({ news, summary }: { news: NewsWithStringDate; summary: Pro
                 }
               >
                 <Await resolve={summary}>
-                  {(summary) => (
-                    <div
-                      className="prose-sm text-gray-700"
-                      dangerouslySetInnerHTML={{
-                        __html:
-                          summary?.summary?.replace(/\n/g, '<br>') || '<p class="text-gray-500">요약이 없습니다.</p>',
-                      }}
-                    />
-                  )}
+                  {(summary) =>
+                    summary?.summary ? (
+                      <ReactMarkdown
+                        children={summary.summary}
+                        remarkPlugins={[remarkGfm]} // GFM (테이블, 취소선 등) 활성화
+                        rehypePlugins={[rehypeRaw]} // HTML 렌더링 허용 (주의해서 사용)
+                        // rehypePlugins={[rehypeRaw, rehypeSanitize]} // HTML을 렌더링하되, 보안을 위해 sanitize 처리
+                      />
+                    ) : (
+                      <p className="text-gray-500">요약이 없습니다.</p>
+                    )
+                  }
                 </Await>
               </Suspense>
             </div>
