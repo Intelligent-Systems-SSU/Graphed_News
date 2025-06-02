@@ -18,7 +18,7 @@ export default function ATestPage() {
         <div>
           <h2 className="text-xl font-semibold mb-2">📄 기사 링크</h2>
           <a
-            href="https://example.com/ai-summary-article" // 실제 요약 기사 링크로 바꾸기
+            href="http://localhost:5173/article/1" // 실제 요약 기사 링크로 바꾸기
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 underline text-lg"

@@ -18,7 +18,7 @@ export default function TestPage() {
         <div>
           <h2 className="text-xl font-semibold mb-2">📄 기사 링크</h2>
           <a
-            href="https://example.com/article-link" // ← 실제 기사 URL로 변경
+            href="https://n.news.naver.com/article/009/0005502323?cds=news_media_pc" // ← 실제 기사 URL로 변경
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 underline text-lg"
