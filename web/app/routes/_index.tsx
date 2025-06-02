@@ -12,30 +12,10 @@ export default function Index() {
   return (
     <div className="bg-[#f7f7f5] min-h-screen">
       {/* Hero Section */}
-      <section className="text-center px-6 py-20 max-w-5xl mx-auto">
-        <h1 className="text-4xl font-bold leading-tight mb-4">
-          <span className="text-gradient bg-gradient-to-r from-green-400 via-blue-500 to-pink-500 text-transparent bg-clip-text">
-            뉴스, 더 깊이 있게 이해하자
-          </span>
-        </h1>
-        <p className="text-lg text-gray-700 mb-8">
-          SSU KA News는 AI 요약과 시각화를 통해
-          <br />
-          뉴스의 전후 맥락과 핵심 정보를 한눈에 제공합니다.
-        </p>
-        <div className="flex justify-center gap-4">
-          <Link to="/article" className="bg-black text-white py-3 px-6 rounded-full text-lg hover:bg-gray-800">
-            시작하기
-          </Link>
-          <a
-            href="#features"
-            className="border border-gray-400 text-gray-700 py-3 px-6 rounded-full text-lg hover:bg-gray-100"
-          >
-            자세히 보기
-          </a>
-        </div>
+      <section className="relative min-h-[900px] w-full overflow-hidden">
+        {/* 배경 이미지 */}
         <img
-          src="/hero-graphic.png"
+          src="/main-hero.png"
           alt="서비스 시연 이미지"
           loading="lazy"
           onError={(e) => {
@@ -44,8 +24,33 @@ export default function Index() {
               e.currentTarget.src = fallback;
             }
           }}
-          className="mt-12 mx-auto max-w-full rounded-xl shadow-xl"
+          className="absolute inset-0 w-full h-full object-cover opacity-80"
         />
+
+        {/* 어두운 레이어 (텍스트 대비용) */}
+        <div className="absolute inset-0 bg-black opacity-20" />
+
+        {/* 오버레이 콘텐츠 */}
+        <div className="relative z-10 flex flex-col items-center text-center w-full pt-24 px-4">
+          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4 drop-shadow-xl">
+            <span className="bg-gradient-to-r from-indigo-900 via-blue-500 to-purple-500 bg-[length:200%_100%] bg-clip-text text-transparent animate-gradient">
+              뉴스, 더 깊이 있게 이해하자
+            </span>
+          </h1>
+          <p className="text-lg md:text-xl text-white drop-shadow mt-2 mb-6 max-w-2xl">
+            SSU KA News는 AI 요약과 시각화를 통해
+            <br />
+            뉴스의 전후 맥락과 핵심 정보를 한눈에 제공합니다.
+          </p>
+          <div className="flex gap-4">
+            <Link to="/article" className="bg-black text-white py-3 px-6 rounded-full text-lg hover:bg-gray-800">
+              시작하기
+            </Link>
+            <a href="#features" className="bg-white text-gray-800 py-3 px-6 rounded-full text-lg hover:bg-gray-100">
+              자세히 보기
+            </a>
+          </div>
+        </div>
       </section>
 
       {/* Features Section */}
