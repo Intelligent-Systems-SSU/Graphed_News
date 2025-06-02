@@ -9,7 +9,7 @@ const Navigation = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center space-x-8">
             <Link to="/" className="text-xl font-bold text-gray-900">
-              Graphed News
+              📰 SSU KA World
             </Link>
             <div className="hidden md:flex items-center space-x-6">
               <NavLink to="/" label="홈" />
