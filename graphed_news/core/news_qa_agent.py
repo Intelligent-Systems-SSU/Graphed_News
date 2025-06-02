@@ -9,6 +9,7 @@ from langchain.agents import create_react_agent, AgentExecutor
 from langchain import hub
 from langchain_community.tools.tavily_search import TavilySearchResults
 from typing import List, Dict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 load_dotenv()
 
@@ -19,7 +20,7 @@ def get_background_info_search(query: str) -> str:
     return results
 
 class NewsQnAAgent:
-    def __init__(self, model_name="gpt-4o-mini", temperature=0):
+    def __init__(self, model_name="gpt-4.1-mini", temperature=0):
         """
         뉴스 QnA 에이전트 초기화
         
@@ -29,7 +30,7 @@ class NewsQnAAgent:
         """
         self.llm = ChatOpenAI(
             temperature=temperature,
-            model_name=model_name,
+            model=model_name,
         )
         self.tools = [
             Tool(
@@ -93,17 +94,37 @@ class NewsQnAAgent:
 
     def process_questions(self, news_content: str, questions: List[str]) -> List[Dict[str, str]]:
         """
-        뉴스 기사에 대한 여러 질문에 답변합니다.
+        뉴스 기사에 대한 여러 질문에 답변합니다. (병렬 처리)
         
         Args:
             news_content (str): 정제된 뉴스 기사 내용
             questions (List[str]): 질문 목록
             
         Returns:
-            List[Dict[str, str]]: 질문과 답변 쌍의 목록
+            List[Dict[str, str]]: 질문과 답변 쌍의 목록 (원래 순서 유지)
         """
-        answers = []
-        for question in questions:
-            answer = self.answer_question(news_content, question)
-            answers.append({question: answer})
+        if not questions:
+            return []
+        
+        answers = [{}] * len(questions)  # 원래 순서를 유지하기 위한 리스트
+        
+        # ThreadPoolExecutor를 사용하여 병렬 처리
+        with ThreadPoolExecutor(max_workers=min(len(questions), 5)) as executor:
+            # 각 질문을 인덱스와 함께 제출
+            future_to_index = {
+                executor.submit(self.answer_question, news_content, question): i
+                for i, question in enumerate(questions)
+            }
+            
+            # 완료된 작업들을 처리
+            for future in as_completed(future_to_index):
+                index = future_to_index[future]
+                question = questions[index]
+                try:
+                    answer = future.result()
+                    answers[index] = {question: answer}
+                except Exception as e:
+                    print(f"질문 '{question}'에 대한 답변 생성 중 오류 발생: {str(e)}")
+                    answers[index] = {question: f"답변 생성 중 오류가 발생했습니다: {str(e)}"}
+        
         return answers

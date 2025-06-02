@@ -89,12 +89,12 @@ def serve():
         NewsSummaryServicer(), server)
     
     # 서버 포트 설정
-    server_address = '[::]:4884'
+    server_address = '[::]:8501'
     server.add_insecure_port(server_address)
     
     # 서버 시작
     server.start()
-    print(f"서버가 시작되었습니다. 포트: 4884")
+    print(f"서버가 시작되었습니다. 포트: 8501")
     
     # 서버 실행 유지
     server.wait_for_termination()

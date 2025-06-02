@@ -3,6 +3,7 @@
 """
 import asyncio
 import argparse
+import httpx
 from typing import Dict, Any
 
 from core.news_crawler import crawl_news
@@ -74,9 +75,34 @@ async def main():
     parser = argparse.ArgumentParser(description="News article crawler and enhancer")
     parser.add_argument("--url", type=str, help="URL of the news article to process",
                         default="https://n.news.naver.com/article/082/0001326467")
+    parser.add_argument("--news-id", type=str, help="News ID for the POST request", required=False)
     args = parser.parse_args()
     
     result = await process_news_article(args.url)
+    
+    # POST 요청으로 결과 전송
+    if args.news_id:
+        try:
+            print(f"\nPOST 요청 전송 중... (newsId: {args.news_id})")
+            async with httpx.AsyncClient() as client:
+                res = await client.post(
+                    'https://graphed-news.pages.dev/ai',
+                    json={
+                        'newsId': args.news_id,
+                        'summary': result["final_summary"],
+                        'keyword': result["final_summary"]
+                    }
+                )
+                print(f"POST 요청 완료 - 상태 코드: {res.status_code}")
+                if res.status_code == 200:
+                    print("결과가 성공적으로 전송되었습니다.")
+                else:
+                    print(f"POST 요청 실패: {res.text}")
+        except Exception as e:
+            print(f"POST 요청 중 오류 발생: {e}")
+    else:
+        print("\n--news-id 인수가 제공되지 않아 POST 요청을 건너뜁니다.")
+    
     return result
 
 if __name__ == "__main__":

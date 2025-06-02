@@ -9,6 +9,7 @@ dependencies = [
     "google>=3.0.0",
     "grpcio>=1.71.0",
     "grpcio-tools>=1.71.0",
+    "httpx>=0.28.1",
     "ipykernel>=6.29.5",
     "langchain>=0.3.25",
     "langchain-community>=0.3.24",
