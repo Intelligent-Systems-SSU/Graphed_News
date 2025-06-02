@@ -48,7 +48,7 @@ async def process_news_article(url: str) -> Dict[str, Any]:
     print("\n키워드 및 설명:")
     for item in final_result["final_keywords_with_explanation"]:
         print(f"- 키워드: {item['keyword']}")
-        print(f"  설명: {item['explanation'][:100]}...\n")
+        print(f"  설명: {item['description']}")
     
     print("\n최종 요약:")
     print(final_result["final_summary"])
@@ -74,7 +74,7 @@ async def main():
     """
     parser = argparse.ArgumentParser(description="News article crawler and enhancer")
     parser.add_argument("--url", type=str, help="URL of the news article to process",
-                        default="https://n.news.naver.com/article/082/0001326467")
+                        default="https://n.news.naver.com/mnews/article/421/0008261200")
     parser.add_argument("--news-id", type=str, help="News ID for the POST request", required=False)
     args = parser.parse_args()
     
@@ -90,7 +90,7 @@ async def main():
                     json={
                         'newsId': args.news_id,
                         'summary': result["final_summary"],
-                        'keyword': result["final_summary"]
+                        'keyword': result["final_keywords"]
                     }
                 )
                 print(f"POST 요청 완료 - 상태 코드: {res.status_code}")

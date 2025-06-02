@@ -178,8 +178,20 @@ class NewsAccumulator:
         }
         
         final_state = self.accumulator_app.invoke(initial_state)
+
+        # 최종 상태에서 필요한 정보 추출하고 형태 변환
+        keywords_with_explanation = final_state.get("final_keywords_with_explanation", [])
+        
+        # 형태 변환: {"keyword": "키워드", "explanation": "설명"} -> {"keyword": "키워드", "description": "설명"}
+        formatted_keywords = []
+        for item in keywords_with_explanation:
+            key, value = next(iter(item.items()))
+            formatted_keywords.append({
+                "keyword": key,
+                "description": value
+            })
         
         return {
-            "final_keywords_with_explanation": final_state.get("final_keywords_with_explanation", []),
+            "final_keywords_with_explanation": formatted_keywords,
             "final_summary": final_state.get("final_summary", "")
         }
