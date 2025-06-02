@@ -108,10 +108,10 @@ class NewsAccumulator:
             search_results = self.search_tool.invoke(keyword)
             explanation = explanation_chain.invoke({
                 "keyword": keyword,
-                "news_content": content[:1000],  # Provide a snippet for context
+                "news_content": content,  # Provide a snippet for context
                 "search_results": search_results
             })
-            explanations.append({"keyword": keyword, "explanation": explanation})
+            explanations.append({"keyword": keyword, "description": explanation})
             
         return {"final_keywords_with_explanation": explanations}
 
@@ -181,17 +181,8 @@ class NewsAccumulator:
 
         # 최종 상태에서 필요한 정보 추출하고 형태 변환
         keywords_with_explanation = final_state.get("final_keywords_with_explanation", [])
-        
-        # 형태 변환: {"keyword": "키워드", "explanation": "설명"} -> {"keyword": "키워드", "description": "설명"}
-        formatted_keywords = []
-        for item in keywords_with_explanation:
-            key, value = next(iter(item.items()))
-            formatted_keywords.append({
-                "keyword": key,
-                "description": value
-            })
-        
+
         return {
-            "final_keywords_with_explanation": formatted_keywords,
+            "final_keywords_with_explanation": keywords_with_explanation,
             "final_summary": final_state.get("final_summary", "")
         }
