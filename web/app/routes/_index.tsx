@@ -1,5 +1,5 @@
 import type { MetaFunction } from '@remix-run/cloudflare';
-import { Link } from '@remix-run/react';
+import { Link, useNavigate } from '@remix-run/react';
 
 export const meta: MetaFunction = () => {
   return [
@@ -9,6 +9,8 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
+  const navigate = useNavigate();
+
   return (
     <div className="bg-[#f7f7f5] min-h-screen">
       {/* Hero Section */}
@@ -46,9 +48,28 @@ export default function Index() {
             <Link to="/article" className="bg-black text-white py-3 px-6 rounded-full text-lg hover:bg-gray-800">
               시작하기
             </Link>
-            <a href="#features" className="bg-white text-gray-800 py-3 px-6 rounded-full text-lg hover:bg-gray-100">
+            <button
+              onClick={() => {
+                const section = document.getElementById('features');
+                section?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="bg-white text-gray-800 py-3 px-6 rounded-full text-lg hover:bg-gray-100"
+            >
               자세히 보기
-            </a>
+            </button>
+          </div>
+          {/* AB테스트 버튼을 아래에 별도 배치 */}
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={() => {
+                // 50% 확률로 A/B 테스트 페이지로 이동
+                const ab = Math.random() < 0.5 ? 'A' : 'B';
+                navigate(`/test/${ab}`);
+              }}
+              className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-2 px-5 rounded-full text-base hover:opacity-90"
+            >
+              AB테스트
+            </button>
           </div>
         </div>
       </section>
