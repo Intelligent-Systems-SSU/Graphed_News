@@ -26,7 +26,7 @@ def extract_news_content(content):
         NewsArticle: 필요한 부분만 추출된 뉴스 기사 객체 (content, topic, keywords)
     """
     llm = ChatOpenAI(
-        model="gpt-4o-mini",
+        model="gpt-4.1-mini",
         temperature=0
     )
     

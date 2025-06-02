@@ -48,7 +48,7 @@ async def process_news_article(url: str) -> Dict[str, Any]:
     print("\n키워드 및 설명:")
     for item in final_result["final_keywords_with_explanation"]:
         print(f"- 키워드: {item['keyword']}")
-        print(f"  설명: {item['explanation']}")
+        print(f"  설명: {item['description']}")
     
     print("\n최종 요약:")
     print(final_result["final_summary"])

@@ -35,7 +35,7 @@ class AccumulatorState(TypedDict):
 
 
 class NewsAccumulator:
-    def __init__(self, model_name="gpt-4o-mini", temperature=0):
+    def __init__(self, model_name="gpt-4.1-mini", temperature=0):
         """
         뉴스 Accumulator 초기화
         
@@ -53,7 +53,7 @@ class NewsAccumulator:
 
     def _format_keyword_explanations(self, explanations: List[Dict[str, str]]) -> str:
         """키워드 설명 목록을 문자열 형태로 변환"""
-        return "\n".join([f"Keyword: {item['keyword']}\nExplanation: {item['explanation']}" for item in explanations])
+        return "\n".join([f"Keyword: {item['keyword']}\nExplanation: {item['description']}" for item in explanations])
 
     def _select_final_keywords_node(self, state: AccumulatorState):
         """중요 키워드 선택 노드"""
@@ -133,6 +133,8 @@ class NewsAccumulator:
 
     주요 키워드 및 설명:
     {keyword_explanations}
+
+    최종 종합 보고서는 사건 개요로 시작해서 질의응답으로 끝나야 합니다. 
 
     최종 종합 보고서 (한국어):"""
         )
