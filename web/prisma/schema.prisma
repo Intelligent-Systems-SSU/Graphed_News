@@ -70,8 +70,9 @@ model ABTest {
 
 model TestSolve {
   id     Int    @id @default(autoincrement())
+  testType String
   test   ABTest @relation(fields: [testId], references: [id])
   testId Int
   name   String
-  time   Float
+  time   Float?
 }
