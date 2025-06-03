@@ -1,0 +1,26 @@
+# LLM 모델 설정
+models:
+  news_processor:
+    model: "gpt-4.1-nano"
+    temperature: 0
+  
+  news_question_generator:
+    model: "gpt-4.1-nano" 
+    temperature: 0.7
+  
+  news_qa_agent:
+    model: "gpt-4.1-nano"
+    temperature: 0.2
+  
+  news_ka_agent:
+    model: "gpt-4.1-nano"
+    temperature: 0
+
+  news_accumulator:
+    model: "gpt-4.1"
+    temperature: 0.2
+
+# 기본 설정
+default:
+  model: "gpt-4.1-mini"
+  temperature: 0

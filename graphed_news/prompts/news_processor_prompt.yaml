@@ -1,0 +1,13 @@
+prompt: |
+   The following is news article content obtained through web crawling. 
+   Please perform the following three tasks:
+
+   1. Extract only the actual news article content (title, body, date) and 
+      remove all unnecessary content such as advertisements, menus, footers, sidebars, etc.
+   2. Extract the topic of the news article. The topic should be written as a word or short sentence that summarizes the article.
+   3. Extract 5-10 key keywords for searching related topic articles. Short phrases are also acceptable.
+
+   Original content:
+   {raw_content}
+
+   {format_instructions}

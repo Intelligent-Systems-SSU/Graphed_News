@@ -28,4 +28,4 @@ async def crawl_news(url):
             url=url,
             config=run_config
         )
-        return result.markdown  # Return clean markdown content
+        return result.markdown

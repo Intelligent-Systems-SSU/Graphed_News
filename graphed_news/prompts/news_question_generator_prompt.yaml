@@ -1,0 +1,10 @@
+news_qa_generator_prompt: |
+  Here is the news article content:
+
+  {content}
+
+  Please generate multiple questions about parts of this article that are difficult to understand.
+  The questions should be clear and specific, and must be based on the article content.
+  Each question should be independent.
+
+  {format_instructions}
