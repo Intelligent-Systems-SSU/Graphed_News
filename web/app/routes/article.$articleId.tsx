@@ -127,20 +127,22 @@ function NewsBody({
                   </div>
                 }
               >
-                <Await resolve={summary}>
-                  {(summary) =>
-                    summary?.summary ? (
-                      <ReactMarkdown
-                        children={summary.summary}
-                        remarkPlugins={[remarkGfm]} // GFM (테이블, 취소선 등) 활성화
-                        rehypePlugins={[rehypeRaw]} // HTML 렌더링 허용 (주의해서 사용)
-                        // rehypePlugins={[rehypeRaw, rehypeSanitize]} // HTML을 렌더링하되, 보안을 위해 sanitize 처리
-                      />
-                    ) : (
-                      <p className="text-gray-500">요약이 없습니다.</p>
-                    )
-                  }
-                </Await>
+                <article className="prose">
+                  <Await resolve={summary}>
+                    {(summary) =>
+                      summary?.summary ? (
+                        <ReactMarkdown
+                          children={summary.summary}
+                          remarkPlugins={[remarkGfm]} // GFM (테이블, 취소선 등) 활성화
+                          rehypePlugins={[rehypeRaw]} // HTML 렌더링 허용 (주의해서 사용)
+                          // rehypePlugins={[rehypeRaw, rehypeSanitize]} // HTML을 렌더링하되, 보안을 위해 sanitize 처리
+                        />
+                      ) : (
+                        <p className="text-gray-500">요약이 없습니다.</p>
+                      )
+                    }
+                  </Await>
+                </article>
               </Suspense>
             </div>
           </aside>
