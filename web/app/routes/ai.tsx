@@ -22,12 +22,11 @@ export const action = createAction(async ({ db, request }) => {
     create: { newsId, summary },
   });
 
-  keywords.map((keyword) => {
-    console.log(keyword);
+  keywords.map(([keyword]) => {
     db.newsKeyword.upsert({
       where: { newsId },
-      update: { ...keyword[0] },
-      create: { newsId, ...keyword[0] },
+      update: { ...keyword },
+      create: { newsId, ...keyword },
     });
   });
 
