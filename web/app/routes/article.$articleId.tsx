@@ -1,55 +1,57 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
-import { Suspense } from "react";
-import { Link, Await, useLoaderData } from "@remix-run/react";
-import { Tooltip } from "react-tooltip";
-import "react-tooltip/dist/react-tooltip.css";
+import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare';
+import { Suspense } from 'react';
+import { Link, Await, useLoaderData } from '@remix-run/react';
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
 
-import { News, NewsSummary } from "@prisma/client";
-import createLoader from "app/utils/createLoader";
-import { getPrismaClient } from "app/utils/prisma";
-import { annotateContent, RefItem } from "app/utils/annotate";
-import ExternalLinkIcon from "app/components/ExternalLinkIcon";
+import { News, NewsSummary } from '@prisma/client';
+import createLoader from 'app/utils/createLoader';
+import { getPrismaClient } from 'app/utils/prisma';
+import { annotateContent, RefItem } from 'app/utils/annotate';
+import ExternalLinkIcon from 'app/components/ExternalLinkIcon';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
 
 /* ---------- 타입 ---------- */
-type NewsWithStringDate = Omit<News, "createdAt"> & { createdAt: string };
+type NewsWithStringDate = Omit<News, 'createdAt'> & { createdAt: string };
 type KeywordRow = { keyword: string; description: string };
 
 /* ---------- <head> ---------- */
 export const meta: MetaFunction<typeof loader> = ({ data }) => [
-  { title: data?.news?.title ?? "Article" },
+  { title: data?.news?.title ?? 'Article' },
   {
-    name: "description",
-    content:
-      data?.news?.content.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 70) ??
-      "기사 요약을 확인해보세요.",
+    name: 'description',
+    content: data?.news?.content.replace(/<\/?[^>]+(>|$)/g, '').slice(0, 70) ?? '기사 요약을 확인해보세요.',
   },
 ];
 
+const loadSummary = async (db: ReturnType<typeof getPrismaClient>, articleId: string) => {
+  return await db.newsSummary.findUnique({ where: { newsId: Number(articleId) } });
+};
+
 /* ---------- 로더 ---------- */
-export const loader = createLoader(async ({
-  params,
-  db,
-}: LoaderFunctionArgs & { db: ReturnType<typeof getPrismaClient> }) => {
-  if (!params.articleId) throw new Error("Article ID is required");
-  const id = Number(params.articleId);
+export const loader = createLoader(
+  async ({ params, db }: LoaderFunctionArgs & { db: ReturnType<typeof getPrismaClient> }) => {
+    if (!params.articleId) throw new Error('Article ID is required');
+    const id = Number(params.articleId);
 
-  const news = await db.news.findUnique({
-    where: { id },
-    include: { newsKeyword: { select: { keyword: true, description: true } } },
-  });
-  if (!news) throw new Response("Not Found", { status: 404 });
+    const news = await db.news.findUnique({
+      where: { id },
+      include: { newsKeyword: { select: { keyword: true, description: true } } },
+    });
+    if (!news) throw new Response('Not Found', { status: 404 });
+    const summary = loadSummary(db, params.articleId);
 
-  const { annotated, refs } = annotateContent(
-    news.content,
-    news.newsKeyword as KeywordRow[],
-  );
+    const { annotated, refs } = annotateContent(news.content, news.newsKeyword as KeywordRow[]);
 
-  return {
-    news: { ...news, content: annotated, createdAt: news.createdAt.toISOString() },
-    refs,
-    summary: db.newsSummary.findUnique({ where: { newsId: id } }),
-  };
-});
+    return {
+      news: { ...news, content: annotated, createdAt: news.createdAt.toISOString() },
+      refs,
+      summary,
+    };
+  }
+);
 
 /* ---------- 페이지 ---------- */
 export default function ArticleRoute() {
@@ -91,10 +93,10 @@ function NewsBody({
           <h1 className="text-3xl md:text-4xl font-bold mb-4">{news.title}</h1>
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 border-b pb-6">
             <time dateTime={news.createdAt}>
-              {new Date(news.createdAt).toLocaleDateString("ko-KR", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
+              {new Date(news.createdAt).toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
               })}
             </time>
             {news.url && (
@@ -130,11 +132,8 @@ function NewsBody({
                   {refs.map(({ order, description }) => (
                     <li key={order} id={`note-${order}`}>
                       <p className="inline">
-                        {description}{" "}
-                        <a
-                          href={`#cite-${order}`}
-                          className="text-blue-600 ml-1"
-                        >
+                        {description}{' '}
+                        <a href={`#cite-${order}`} className="text-blue-600 ml-1">
                           ↩︎
                         </a>
                       </p>
@@ -145,12 +144,9 @@ function NewsBody({
             )}
           </div>
 
-          {/* 요약 */}
           <aside className="lg:w-1/3">
             <div className="bg-gray-50 rounded-lg p-5 sticky top-6">
-              <h2 className="text-lg font-semibold mb-4 pb-2 border-b">
-                기사 요약
-              </h2>
+              <h2 className="text-lg font-semibold mb-4 pb-2 border-b">기사 요약</h2>
               <Suspense
                 fallback={
                   <div className="animate-pulse space-y-3">
@@ -161,16 +157,18 @@ function NewsBody({
                 }
               >
                 <Await resolve={summary}>
-                  {(s) => (
-                    <div
-                      className="prose-sm text-gray-700"
-                      dangerouslySetInnerHTML={{
-                        __html:
-                          s?.summary?.replace(/\n/g, "<br>") ||
-                          '<p class="text-gray-500">요약이 없습니다.</p>',
-                      }}
-                    />
-                  )}
+                  {(summary) =>
+                    summary?.summary ? (
+                      <ReactMarkdown
+                        children={summary.summary}
+                        remarkPlugins={[remarkGfm]} // GFM (테이블, 취소선 등) 활성화
+                        rehypePlugins={[rehypeRaw]} // HTML 렌더링 허용 (주의해서 사용)
+                        // rehypePlugins={[rehypeRaw, rehypeSanitize]} // HTML을 렌더링하되, 보안을 위해 sanitize 처리
+                      />
+                    ) : (
+                      <p className="text-gray-500">요약이 없습니다.</p>
+                    )
+                  }
                 </Await>
               </Suspense>
             </div>
@@ -184,10 +182,7 @@ function NewsBody({
 /* ---------- 목록 링크 ---------- */
 const BackToListLink = () => (
   <div className="mb-4">
-    <Link
-      to="/article"
-      className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
-    >
+    <Link to="/article" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
       </svg>
