@@ -3,6 +3,7 @@ import type { LinksFunction, MetaFunction } from '@remix-run/cloudflare';
 import { useEffect } from 'react';
 import styles from './tailwind.css?url';
 import Layout from './components/Layout';
+import kw from "app/styles/kw.css";
 
 export const links: LinksFunction = () => [
   {
@@ -21,6 +22,10 @@ export const links: LinksFunction = () => [
   {
     rel: 'stylesheet',
     href: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap',
+  },
+  { 
+    rel: "stylesheet", 
+    href: kw
   },
 ];
 
