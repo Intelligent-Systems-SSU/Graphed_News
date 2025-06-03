@@ -114,39 +114,10 @@ function NewsBody({
         </header>
 
         {/* 본문 & 요약 */}
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* 본문 */}
-          <div className="lg:w-2/3">
-            <div
-              className="prose max-w-none"
-              // eslint-disable-next-line react/no-danger
-              dangerouslySetInnerHTML={{ __html: news.content }}
-            />
-
-            {/* ---------- 각주 목록 ---------- */}
-            {refs.length > 0 && (
-              <section id="references" className="mt-10">
-                <hr className="my-6" />
-                <h2 className="text-lg font-semibold mb-4">주석</h2>
-                <ol className="list-decimal pl-6 space-y-2">
-                  {refs.map(({ order, description }) => (
-                    <li key={order} id={`note-${order}`}>
-                      <p className="inline">
-                        {description}{' '}
-                        <a href={`#cite-${order}`} className="text-blue-600 ml-1">
-                          ↩︎
-                        </a>
-                      </p>
-                    </li>
-                  ))}
-                </ol>
-              </section>
-            )}
-          </div>
-
-          <aside className="lg:w-1/3">
+        <div className="flex flex-col lg:flex-col gap-8">
+          <aside>
             <div className="bg-gray-50 rounded-lg p-5 sticky top-6">
-              <h2 className="text-lg font-semibold mb-4 pb-2 border-b">기사 요약</h2>
+              <h2 className="text-lg font-semibold mb-4 pb-2 border-b"> 🔍 기사 심층 요약 </h2>
               <Suspense
                 fallback={
                   <div className="animate-pulse space-y-3">
@@ -173,6 +144,34 @@ function NewsBody({
               </Suspense>
             </div>
           </aside>
+          {/* 본문 */}
+          <div>
+            <div
+              className="prose max-w-none"
+              // eslint-disable-next-line react/no-danger
+              dangerouslySetInnerHTML={{ __html: news.content }}
+            />
+
+            {/* ---------- 각주 목록 ---------- */}
+            {refs.length > 0 && (
+              <section id="references" className="mt-10">
+                <hr className="my-6" />
+                <h2 className="text-lg font-semibold mb-4">주석</h2>
+                <ol className="list-decimal pl-6 space-y-2">
+                  {refs.map(({ order, description }) => (
+                    <li key={order} id={`note-${order}`}>
+                      <p className="inline">
+                        {description}{' '}
+                        <a href={`#cite-${order}`} className="text-blue-600 ml-1">
+                          ↩︎
+                        </a>
+                      </p>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            )}
+          </div>
         </div>
       </article>
     </div>
