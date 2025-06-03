@@ -8,4 +8,3 @@ news_qa_generator_prompt: |
   각 질문은 독립적이어야 합니다.
 
   {format_instructions}
-ㄴ

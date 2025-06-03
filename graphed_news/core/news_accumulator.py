@@ -44,13 +44,30 @@ class NewsAccumulator:
           
         # 구조화된 출력을 위한 LLM 설정
         structured_llm = self.llm.with_structured_output(FinalReport)
-        
-        chain = prompt | structured_llm  
-        result = chain.invoke({  
+
+        # 실제 입력 데이터 준비
+        input_data = {
             "extracted_content": news_content['content'],  
             "qa": self._format_qa(qa),
             "ka": self._format_qa(ka)
-        })  
+        }
+        
+        """debug용: 프롬프트 포맷팅 확인"""
+        # 실제 프롬프트 포맷팅해서 확인
+        formatted_messages = prompt.format_messages(**input_data)
+        
+        print("=" * 80)
+        print("🔍 실제 LLM에 전송되는 프롬프트:")
+        print("=" * 80)
+        for i, message in enumerate(formatted_messages):
+            print(f"Message {i+1} ({message.type}):")
+            print(f"{message.content}")
+            print("-" * 60)
+        print("=" * 80)
+        """debug용: 프롬프트 포맷팅 확인"""
+        
+        chain = prompt | structured_llm  
+        result = chain.invoke(input_data)  
             
         # 결과가 딕셔너리인 경우 FinalReport로 변환
         if isinstance(result, dict):
@@ -72,31 +89,31 @@ class NewsAccumulator:
 
         # 최종 보고서를 문자열로 변환하여 반환
         doc = f"""
-    # {news_content['topic']}
+### {news_content['topic']}
 
-    ## 개요 및 배경
-    {report.overview}
+#### 개요 및 배경
+{report.overview}
 
-    ## 주요 포인트
-    {report.key_points}
+#### 주요 포인트
+{report.key_points}
 
-    ## 사실 정리 및 주요 내용
-    {report.main_reports}
+#### 사실 정리 및 주요 내용
+{report.main_reports}
 
-    ## 분석 및 원인
-    {report.analysis}
+#### 분석 및 원인
+{report.analysis}
 
-    ## 영향 및 문제점
-    {report.impact}
+#### 영향 및 문제점
+{report.impact}
 
-    ## 해결 조치 또는 향후 조치
-    {report.resolution_nextsteps}
+#### 해결 조치 또는 향후 조치
+{report.resolution_nextsteps}
 
-    ## 요약 및 제언
-    {report.summary_recommendations}
+#### 요약 및 제언
+{report.summary_recommendations}
 
-    ## 질의응답 통찰
-    {report.qa_insights}
+#### 질의응답 통찰
+{report.qa_insights}
     """
 
         return doc
