@@ -51,7 +51,7 @@ model NewsSummary {
 model NewsKeyword {
   id          Int    @id @default(autoincrement())
   news        News   @relation(fields: [newsId], references: [id])
-  newsId      Int    @unique
+  newsId      Int   
   keyword     String
   description String
 }
