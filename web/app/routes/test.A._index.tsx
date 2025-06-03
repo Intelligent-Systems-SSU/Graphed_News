@@ -10,6 +10,7 @@ export const action = createAction(async ({ db, request }) => {
 
   const testSolve = await db.testSolve.create({
     data: {
+      testType: 'A',
       testId,
       name: name ?? '익명',
       time,
@@ -48,8 +49,15 @@ export default function ATestPage() {
 
         <div>
           <h2 className="text-xl font-semibold mb-2">📝 퀴즈 응시하기</h2>
-          <Form method="post">
-            <input type="hidden" name="name" value="익명" />
+          <Form method="post" className="space-y-4">
+            {/* 이름 입력 필드 */}
+            <input
+              type="text"
+              name="name"
+              placeholder="이름을 입력해주세요"
+              className="w-full border border-gray-300 rounded-md px-4 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              required
+            />
             <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-md text-lg">
               퀴즈 시작
             </button>
