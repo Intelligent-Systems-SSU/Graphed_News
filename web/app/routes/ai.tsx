@@ -22,18 +22,17 @@ export const action = createAction(async ({ db, request }) => {
     create: { newsId, summary },
   });
 
-  console.log(keywords);
+  await db.newsKeyword.deleteMany({ where: { newsId } });
 
-  keywords.map((keyword) => {
-    console.log(keyword);
-    db.newsKeyword.create({
+  for (const keyword of keywords) {
+    await db.newsKeyword.create({
       data: {
         newsId,
         keyword: keyword.keyword,
         description: keyword.description,
       },
     });
-  });
+  }
 
   return new Response(JSON.stringify({ success: true }));
 });
