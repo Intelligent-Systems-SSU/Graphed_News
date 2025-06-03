@@ -22,13 +22,17 @@ export const action = createAction(async ({ db, request }) => {
     create: { newsId, summary },
   });
 
-  keywords.map((keyword) => {
-    db.newsKeyword.upsert({
-      where: { newsId, keyword: keyword.keyword },
-      update: { description: keyword.description },
-      create: { newsId, keyword: keyword.keyword, description: keyword.description },
+  await db.newsKeyword.deleteMany({ where: { newsId } });
+
+  for (const keyword of keywords) {
+    await db.newsKeyword.create({
+      data: {
+        newsId,
+        keyword: keyword.keyword,
+        description: keyword.description,
+      },
     });
-  });
+  }
 
   return new Response(JSON.stringify({ success: true }));
 });
