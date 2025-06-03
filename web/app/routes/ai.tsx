@@ -4,7 +4,7 @@ export const action = createAction(async ({ db, request }) => {
   const data = (await request.json()) as {
     newsId: string;
     summary: string;
-    keyword: { keyword: string; description: string }[][];
+    keyword: { keyword: string; description: string }[];
   };
   const newsId = Number(data.newsId);
   const summary = data.summary;
@@ -22,11 +22,11 @@ export const action = createAction(async ({ db, request }) => {
     create: { newsId, summary },
   });
 
-  keywords.map(([keyword]) => {
+  keywords.map((keyword) => {
     db.newsKeyword.upsert({
-      where: { newsId },
-      update: { ...keyword },
-      create: { newsId, ...keyword },
+      where: { newsId, keyword: keyword.keyword },
+      update: { description: keyword.description },
+      create: { newsId, keyword: keyword.keyword, description: keyword.description },
     });
   });
 
