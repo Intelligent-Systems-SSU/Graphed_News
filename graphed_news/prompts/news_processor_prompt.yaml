@@ -1,13 +1,13 @@
 prompt: |
-   The following is news article content obtained through web crawling. 
-   Please perform the following three tasks:
+   다음은 웹 크롤링을 통해 얻은 뉴스 기사 내용입니다.
+   다음 세 가지 작업을 수행해 주세요:
 
-   1. Extract only the actual news article content (title, body, date) and 
-      remove all unnecessary content such as advertisements, menus, footers, sidebars, etc.
-   2. Extract the topic of the news article. The topic should be written as a word or short sentence that summarizes the article.
-   3. Extract 5-10 key keywords for searching related topic articles. Short phrases are also acceptable.
+   1. 실제 뉴스 기사 내용(제목, 본문, 날짜)만 추출하고
+      광고, 메뉴, 푸터, 사이드바 등 불필요한 내용은 모두 제거해 주세요.
+   2. 뉴스 기사의 주제를 추출해 주세요. 주제는 기사를 요약하는 단어나 짧은 문장으로 작성해 주세요.
+   3. 관련 주제 기사를 검색하기 위한 5-10개의 핵심 키워드를 추출해 주세요. 짧은 구문도 허용됩니다.
 
-   Original content:
+   원본 내용:
    {raw_content}
 
    {format_instructions}
