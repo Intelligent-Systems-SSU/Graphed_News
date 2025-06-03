@@ -73,5 +73,5 @@ model TestSolve {
   test   ABTest @relation(fields: [testId], references: [id])
   testId Int
   name   String
-  time   Float
+  time   Float?
 }
