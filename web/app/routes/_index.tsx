@@ -88,7 +88,7 @@ export default function Index() {
               </p>
             </div>
             <div>
-              <h3 className="text-xl font-semibold">📅 타임라인 맥락 제공</h3>
+              <h3 className="text-xl font-semibold">📅 타임라인 맥락 제공 (🚧TBA)</h3>
               <p className="text-gray-600 mt-2">
                 해당 뉴스 이전과 이후의 흐름을 타임라인으로 정리하여 한눈에 이해할 수 있습니다.
               </p>
