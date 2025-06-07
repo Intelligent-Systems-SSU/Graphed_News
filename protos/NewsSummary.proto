@@ -2,11 +2,13 @@ syntax = "proto3";
 
 message NewsSummaryParams {
 	string url = 1;
+	int64 newsId = 2;
 }
-message NewsSummaryResponse {
-	string summary = 1;
+
+message NewsSummaryResult {
+	bool success = 1;
 }
 
 service NewsSummary {
-	rpc get(NewsSummaryParams) returns (NewsSummaryResponse) {}
+	rpc get(NewsSummaryParams) returns (NewsSummaryResult) {}
 }

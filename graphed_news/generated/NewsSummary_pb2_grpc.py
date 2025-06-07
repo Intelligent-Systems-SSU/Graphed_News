@@ -18,7 +18,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in NewsSummary_pb2_grpc.py depends on'
+        + f' but the generated code in newsSummary_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -37,7 +37,7 @@ class NewsSummaryStub(object):
         self.get = channel.unary_unary(
                 '/NewsSummary/get',
                 request_serializer=NewsSummary__pb2.NewsSummaryParams.SerializeToString,
-                response_deserializer=NewsSummary__pb2.NewsSummaryResponse.FromString,
+                response_deserializer=NewsSummary__pb2.NewsSummaryResult.FromString,
                 _registered_method=True)
 
 
@@ -56,7 +56,7 @@ def add_NewsSummaryServicer_to_server(servicer, server):
             'get': grpc.unary_unary_rpc_method_handler(
                     servicer.get,
                     request_deserializer=NewsSummary__pb2.NewsSummaryParams.FromString,
-                    response_serializer=NewsSummary__pb2.NewsSummaryResponse.SerializeToString,
+                    response_serializer=NewsSummary__pb2.NewsSummaryResult.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -85,7 +85,7 @@ class NewsSummary(object):
             target,
             '/NewsSummary/get',
             NewsSummary__pb2.NewsSummaryParams.SerializeToString,
-            NewsSummary__pb2.NewsSummaryResponse.FromString,
+            NewsSummary__pb2.NewsSummaryResult.FromString,
             options,
             channel_credentials,
             insecure,
