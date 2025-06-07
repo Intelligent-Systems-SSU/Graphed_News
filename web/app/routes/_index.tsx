@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import type { MetaFunction } from '@remix-run/cloudflare';
 import { Link, useNavigate } from '@remix-run/react';
 
@@ -10,6 +11,11 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
   const navigate = useNavigate();
+  const featuresRef = useRef<HTMLElement | null>(null); // features section을 위한 ref
+
+  const handleScrollToFeatures = () => {
+    featuresRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <div className="bg-[#f7f7f5] min-h-screen">
@@ -49,10 +55,7 @@ export default function Index() {
               시작하기
             </Link>
             <button
-              onClick={() => {
-                const section = document.getElementById('features');
-                section?.scrollIntoView({ behavior: 'smooth' });
-              }}
+              onClick={handleScrollToFeatures}
               className="bg-white text-gray-800 py-3 px-6 rounded-full text-lg hover:bg-gray-100"
             >
               자세히 보기
@@ -62,7 +65,6 @@ export default function Index() {
           <div className="flex justify-center mt-4">
             <button
               onClick={() => {
-                // 50% 확률로 A/B 테스트 페이지로 이동
                 const ab = Math.random() < 0.5 ? 'A' : 'B';
                 navigate(`/test/${ab}`);
               }}
@@ -75,7 +77,7 @@ export default function Index() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="bg-white py-20 px-6">
+      <section ref={featuresRef} className="bg-white py-20 px-6">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-6">SSU KA News는 이렇게 작동합니다</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left mt-10">
