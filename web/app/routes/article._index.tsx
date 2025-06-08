@@ -17,7 +17,7 @@ export default function Index() {
   const { data } = useLoaderData<typeof loader>();
 
   return (
-    <div className="max-w-4xl mx-auto px-4 pt-5 pb-8 sm:px-6 lg:px-8">
+    <div className="w-250 max-w-full px-4 mt-6 pb-8 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">기사 목록</h1>
       <Suspense
         fallback={

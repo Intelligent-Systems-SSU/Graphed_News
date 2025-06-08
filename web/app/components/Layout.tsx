@@ -11,7 +11,7 @@ const Layout = ({ children }: LayoutProps) => {
     <div className="min-h-screen bg-white flex flex-col">
       {navState.isEnable && <Navigation />}
       <NavContextProv value={navState}>
-        <main className="grow-1 flex flex-col">{children}</main>
+        <main className="grow-1 flex flex-col items-center">{children}</main>
       </NavContextProv>
     </div>
   );
