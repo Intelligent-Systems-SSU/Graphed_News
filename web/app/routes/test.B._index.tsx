@@ -4,21 +4,19 @@ import createAction from 'app/utils/createAction';
 
 export const action = createAction(async ({ db, request }) => {
   const form = await request.formData();
-  const testId = 1;
   const testType = 'B';
   const name = form.get('name') as string | null;
   const time = null;
 
   const testSolve = await db.testSolve.create({
     data: {
-      testId,
       testType,
       name: name ?? '익명',
       time,
     },
   });
 
-  return redirect(`/test/${testId}/solve/${testSolve.id}`);
+  return redirect(`/test/solve/${testSolve.id}`);
 });
 
 export default function BTestPage() {

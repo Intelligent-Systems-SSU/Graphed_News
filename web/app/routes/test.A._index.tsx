@@ -4,20 +4,18 @@ import createAction from 'app/utils/createAction';
 
 export const action = createAction(async ({ db, request }) => {
   const form = await request.formData();
-  const testId = 1;
   const name = form.get('name') as string | null;
   const time = null; // float 초 단위 시간
 
   const testSolve = await db.testSolve.create({
     data: {
       testType: 'A',
-      testId,
       name: name ?? '익명',
       time,
     },
   });
 
-  return redirect(`/test/${testId}/solve/${testSolve.id}`);
+  return redirect(`/test/solve/${testSolve.id}`);
 });
 
 export default function ATestPage() {
