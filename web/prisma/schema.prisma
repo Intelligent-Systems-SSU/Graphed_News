@@ -22,14 +22,6 @@ model Article {
   @@map("articles")
 }
 
-model Test {
-  id      Int    @id @default(autoincrement())
-  name    String
-  content String
-
-  @@map("tests")
-}
-
 model News {
   id          Int           @id @default(autoincrement())
   url         String
@@ -51,28 +43,15 @@ model NewsSummary {
 model NewsKeyword {
   id          Int    @id @default(autoincrement())
   news        News   @relation(fields: [newsId], references: [id])
-  newsId      Int   
+  newsId      Int
   keyword     String
   description String
 }
 
-model ABTest {
-  id             Int         @id @default(autoincrement())
-  name           String
-  problem1       String
-  problem2       String
-  problem3       String
-  problem1Answer Int
-  problem2Answer Int
-  problem3Answer Int
-  TestSolve      TestSolve[]
-}
-
 model TestSolve {
-  id     Int    @id @default(autoincrement())
-  testType String
-  test   ABTest @relation(fields: [testId], references: [id])
-  testId Int
-  name   String
-  time   Float?
+  id             Int    @id @default(autoincrement())
+  testType       String
+  name           String
+  time           Float?
+  correctAnswers Int? // bitmask
 }
