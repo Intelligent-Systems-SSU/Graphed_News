@@ -1,7 +1,8 @@
-import { useLoaderData } from '@remix-run/react';
+import { useLoaderData, useActionData, useSubmit, useNavigation } from '@remix-run/react';
 import { useNoNavigation } from 'app/components/Navigation';
 import createLoader from 'app/utils/createLoader';
-import { useState } from 'react';
+import createAction from 'app/utils/createAction';
+import { useState, useEffect, useRef } from 'react';
 
 type Question = {
   title: string;
@@ -52,6 +53,29 @@ const questions: Question[] = [
   },
 ];
 
+export const action = createAction(async ({ db, request, params }) => {
+  const formData = await request.formData();
+  const intent = formData.get('intent');
+  const solveId = params.solveid;
+
+  if (intent === 'complete-test') {
+    const correctCount = Number(formData.get('correctCount'));
+    const timeElapsed = Number(formData.get('timeElapsed'));
+
+    await db.testSolve.update({
+      where: { id: Number(solveId) },
+      data: {
+        correctAnswers: correctCount,
+        time: timeElapsed,
+      },
+    });
+
+    return { success: true };
+  }
+
+  return null;
+});
+
 export const loader = createLoader(async ({ db, params }) => {
   const solveId = params.solveid;
 
@@ -67,114 +91,231 @@ export const loader = createLoader(async ({ db, params }) => {
 export default function TestPage() {
   useNoNavigation();
   const { testSolve } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+  const submit = useSubmit();
+  const formRef = useRef<HTMLFormElement>(null);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [result, setResult] = useState<'correct' | 'incorrect' | 'none'>('none');
   const [error, setError] = useState('');
+  const [timeElapsed, setTimeElapsed] = useState(0);
+  const [isTestComplete, setIsTestComplete] = useState(false);
+  const [answers, setAnswers] = useState<boolean[]>([]);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const correctCount = answers.filter(Boolean).length;
+  const totalAnswered = answers.length;
+  const accuracy = totalAnswered > 0 ? Math.round((correctCount / totalAnswered) * 100) : 0;
 
   const question = questions[currentIndex];
+
+  // Timer effect
+  useEffect(() => {
+    if (!isTestComplete) {
+      timerRef.current = setInterval(() => {
+        setTimeElapsed((prev) => prev + 1);
+      }, 1000);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isTestComplete]);
+
+  // Record test results when completed
+  useEffect(() => {
+    if (isTestComplete && !actionData?.success) {
+      const formData = new FormData();
+      formData.append('intent', 'complete-test');
+      formData.append('correctCount', correctCount.toString());
+      formData.append('timeElapsed', timeElapsed.toString());
+      submit(formData, { method: 'post' });
+    }
+  }, [isTestComplete, correctCount, timeElapsed, submit, actionData]);
+
+  // Check if test is complete
+  useEffect(() => {
+    if (currentIndex >= questions.length - 1 && result === 'correct') {
+      setIsTestComplete(true);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    }
+  }, [currentIndex, result]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
 
   const handleSubmit = () => {
     if (selected === null) {
       setError('답을 체크해주세요.');
       return;
     }
-
     setError('');
     setSubmitted(true);
+    const isCorrect = selected === question.answerIndex;
+    setResult(isCorrect ? 'correct' : 'incorrect');
+    setAnswers((prev) => [...prev, isCorrect]);
 
-    if (selected === question.answerIndex) {
-      setResult('correct');
-    } else {
-      setResult('incorrect');
-    }
+    // Move to next question or complete test after a delay
+    setTimeout(() => {
+      if (currentIndex < questions.length - 1) {
+        handleNext();
+      } else {
+        // Submit the form when last question is answered
+        const form = formRef.current;
+        if (form) {
+          form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+        }
+        setIsTestComplete(true);
+      }
+    }, 800);
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => prev + 1);
-    setSelected(null);
-    setSubmitted(false);
-    setResult('none');
-    setError('');
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+      setSelected(null);
+      setSubmitted(false);
+      setResult('none');
+      setError('');
+    } else {
+      setIsTestComplete(true);
+    }
   };
 
-  return (
-    <div className="flex grow-1 md:flex-row flex-col">
-      <div className="grow-1 h-auto border border-gray-300 rounded flex flex-col">
-        <p className="bg-amber-100 p-1 px-2">기사를 읽고 문제에 답해주세요.</p>
-        <iframe
-          className="w-full grow-1"
-          src={
-            testSolve?.testType === 'A'
-              ? 'https://graphed-news.pages.dev/article/4'
-              : 'https://www.newsis.com/view/NISX20250602_0003199154'
-          }
-        />
+  if (isTestComplete) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
+        <div className="w-full max-w-md text-center p-8 bg-white rounded-xl shadow-lg">
+          <div className="text-6xl mb-4">🎉</div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">테스트 완료!</h1>
+          <p className="text-gray-600 mb-6">
+            총 {questions.length}문제 중 {correctCount}문제를 맞추셨습니다.
+            <br />
+            최종 정답률: <span className="font-semibold">{accuracy}%</span>
+          </p>
+          <div className="w-full bg-gray-200 rounded-full h-3 mb-6">
+            <div
+              className="bg-blue-600 h-3 rounded-full transition-all duration-500"
+              style={{ width: `${accuracy}%` }}
+            />
+          </div>
+          <a
+            href="/"
+            className="block w-full px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-center"
+          >
+            홈으로 돌아가기
+          </a>
+        </div>
       </div>
-      <div className="max-w-xl md:sticky md:bottom-0">
-        <section className="bg-white p-3">
-          {/* 상단 타이틀 + 결과 메시지 위치 */}
-          <div className="flex items-center justify-between">
-            <div className="text-xl font-semibold">
-              <span className="text-gray-500 font-bold mr-4">문제 {currentIndex + 1}</span>
-              {question.title}
-            </div>
+    );
+  }
 
-            {/* 정답 / 오답 / 미선택 메시지 */}
-            {(result === 'correct' || result === 'incorrect' || error) && (
-              <span
-                className={`font-semibold whitespace-nowrap ${
-                  result === 'correct' ? 'text-green-600' : result === 'incorrect' ? 'text-red-600' : 'text-red-500'
-                }`}
-              >
-                {error || (result === 'correct' ? '맞았습니다' : '틀렸습니다')}
-              </span>
+  return (
+    <div className="flex flex-col md:flex-row h-screen">
+      {/* Article Section */}
+      <div className="flex-1 border-r border-gray-200 overflow-hidden flex flex-col">
+        <p className="bg-amber-100 p-1 px-2 text-sm">기사를 읽고 문제에 답해주세요.</p>
+        <div className="flex-1 overflow-auto">
+          <iframe
+            className="w-full h-full border-0"
+            src={
+              testSolve?.testType === 'A'
+                ? 'https://graphed-news.pages.dev/article/4'
+                : 'https://www.newsis.com/view/NISX20250602_0003199154'
+            }
+          />
+        </div>
+      </div>
+
+      {/* Question Section */}
+      <div className="md:w-1/3 border-t md:border-t-0 border-gray-200 bg-white flex flex-col">
+        <div className="flex-1 overflow-y-auto p-4">
+          {/* Question Header */}
+          <div className="mb-4">
+            <div className="font-medium text-gray-900">{question.title}</div>
+            {submitted && result && (
+              <div className="mt-1">
+                <span className={`text-sm font-medium ${result === 'correct' ? 'text-green-600' : 'text-red-600'}`}>
+                  {error || (result === 'correct' ? '정답입니다!' : '틀렸습니다')}
+                </span>
+              </div>
             )}
           </div>
 
-          {/* 보기 영역 */}
-          <form className="space-y-4">
+          {/* Options */}
+          <div className="space-y-2 mb-4">
             {question.choices.map((choice, index) => (
-              <div key={index} className="flex items-center">
+              <label
+                key={index}
+                className={`
+                  flex items-center p-2 border rounded cursor-pointer
+                  ${selected === index ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}
+                  hover:bg-gray-50
+                `}
+              >
                 <input
                   type="radio"
-                  id={`option${index}`}
                   name="answer"
                   value={index}
                   checked={selected === index}
                   onChange={() => setSelected(index)}
-                  className="mr-2"
+                  className="h-4 w-4 text-blue-600 mr-2"
                 />
-                <label htmlFor={`option${index}`}>{`${index + 1}. ${choice}`}</label>
-              </div>
+                <span className="text-gray-800">{`${index + 1}. ${choice}`}</span>
+              </label>
             ))}
+          </div>
+        </div>
 
-            {/* 제출 & 다음 버튼을 좌우에 나누어 정렬 */}
-            <div className="mt-6 flex justify-between items-center">
-              {(!submitted || result === 'incorrect') && (
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
-                >
-                  제출
-                </button>
-              )}
-              <div className="flex-1"></div>
-              {submitted && result === 'correct' && currentIndex < questions.length - 1 && (
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
-                >
-                  다음
-                </button>
-              )}
+        {/* Action Bar */}
+        <div className="border-t border-gray-200 p-3 bg-white">
+          <div className="space-y-2">
+            {/* Progress and Stats */}
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-500">
+                  {currentIndex + 1}/{questions.length}
+                </span>
+                <span className="text-sm font-medium text-gray-700">{formatTime(timeElapsed)}</span>
+              </div>
+              <div className="text-sm text-gray-600">
+                정답률: <span className="font-medium">{totalAnswered > 0 ? `${accuracy}%` : '0%'}</span>({correctCount}/
+                {totalAnswered || 0})
+              </div>
             </div>
-          </form>
-        </section>
+
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${totalAnswered > 0 ? accuracy : 0}%` }}
+              />
+            </div>
+            {/* Submit Button */}
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={selected === null}
+                className={`
+                  px-4 py-2 text-sm rounded text-white font-medium
+                  ${selected === null ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}
+                `}
+              >
+                제출
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
