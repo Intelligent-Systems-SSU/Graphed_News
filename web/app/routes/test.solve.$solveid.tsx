@@ -1,4 +1,5 @@
 import { useLoaderData } from '@remix-run/react';
+import { useNoNavigation } from 'app/components/Navigation';
 import createLoader from 'app/utils/createLoader';
 import { useState } from 'react';
 
@@ -64,6 +65,7 @@ export const loader = createLoader(async ({ db, params }) => {
 });
 
 export default function TestPage() {
+  useNoNavigation();
   const { testSolve } = useLoaderData<typeof loader>();
 
   const [currentIndex, setCurrentIndex] = useState(0);

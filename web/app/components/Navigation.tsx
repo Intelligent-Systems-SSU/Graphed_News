@@ -1,4 +1,5 @@
 import { Link, useLocation } from '@remix-run/react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 const Navigation = () => {
   const location = useLocation();
@@ -46,3 +47,29 @@ const NavLink = ({ to, label }: { to: string; label: string }) => {
 };
 
 export default Navigation;
+
+interface NavigationContext {
+  isEnable: boolean;
+  setIsEnable: (value: boolean) => void;
+}
+
+const NavContext = createContext<NavigationContext>({ isEnable: true, setIsEnable: () => {} });
+
+export const NavContextProv = NavContext.Provider;
+
+export const useNavState = () => {
+  const [isEnable, setIsEnable] = useState(true);
+
+  return { isEnable, setIsEnable };
+};
+
+export const useNoNavigation = () => {
+  const { setIsEnable } = useContext(NavContext);
+
+  useEffect(() => {
+    setIsEnable(false);
+    return () => {
+      setIsEnable(true);
+    };
+  }, []);
+};
