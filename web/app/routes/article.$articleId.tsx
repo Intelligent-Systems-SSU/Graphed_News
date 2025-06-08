@@ -84,7 +84,7 @@ function NewsBody({
   summary: Promise<NewsSummary | null>;
 }) {
   return (
-    <div className="max-w-4xl mx-auto px-4 pt-2 pb-8 sm:px-6 lg:px-8">
+    <div className="max-w-4xl mx-auto px-4 pt-6 pb-8 sm:px-6 lg:px-8">
       <BackToListLink />
 
       <article className="bg-white rounded-lg">

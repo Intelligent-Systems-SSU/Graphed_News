@@ -28,24 +28,9 @@ export default function BTestPage() {
         <p className="text-lg leading-relaxed">
           B 테스터는 기사 원문을 읽고 간단한 퀴즈를 응시하여 <strong>얼마나 시간이 걸렸는지</strong>를 확인할 것입니다.
         </p>
-        <p className="text-lg leading-relaxed mt-4">
-          준비가 되셨다면 아래 기사 링크를 클릭하여 기사를 읽은 후, 퀴즈에 응시해 주세요.
-        </p>
       </section>
 
       <section className="mb-16 space-y-8">
-        <div>
-          <h2 className="text-xl font-semibold mb-2">📄 기사 링크</h2>
-          <a
-            href="https://n.news.naver.com/article/009/0005502323?cds=news_media_pc"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 underline text-lg"
-          >
-            원문 기사 바로가기
-          </a>
-        </div>
-
         <div>
           <h2 className="text-xl font-semibold mb-2">📝 퀴즈 응시하기</h2>
           <Form method="post" className="space-y-4">

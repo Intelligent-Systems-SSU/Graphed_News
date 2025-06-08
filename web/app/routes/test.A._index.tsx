@@ -27,24 +27,9 @@ export default function ATestPage() {
         <p className="text-lg leading-relaxed">
           A 테스터는 <strong>SSU KA NEWS에서 AI가 요약·정리해준 기사</strong>를 읽고 퀴즈에 응시하게 됩니다.
         </p>
-        <p className="text-lg leading-relaxed mt-4">
-          준비가 되셨다면 아래 기사 링크를 클릭하여 요약 기사를 읽은 후, 퀴즈에 응시해 주세요.
-        </p>
       </section>
 
       <section className="mb-16 space-y-8">
-        <div>
-          <h2 className="text-xl font-semibold mb-2">📄 기사 링크</h2>
-          <a
-            href="http://localhost:5173/article/1" // 실제 요약 기사 링크로 변경 필요
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 underline text-lg"
-          >
-            요약 기사 바로가기
-          </a>
-        </div>
-
         <div>
           <h2 className="text-xl font-semibold mb-2">📝 퀴즈 응시하기</h2>
           <Form method="post" className="space-y-4">
