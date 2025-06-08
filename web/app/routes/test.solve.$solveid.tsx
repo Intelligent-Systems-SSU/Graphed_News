@@ -102,11 +102,12 @@ export default function TestPage() {
   const [error, setError] = useState('');
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [isTestComplete, setIsTestComplete] = useState(false);
-  const [answers, setAnswers] = useState<boolean[]>([]);
+  const [answerMask, setAnswerMask] = useState<number>(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const correctCount = answers.filter(Boolean).length;
-  const totalAnswered = answers.length;
+  // Count number of set bits in the answer mask
+  const correctCount = answerMask.toString(2).split('1').length - 1;
+  const totalAnswered = currentIndex + 1; // Since we start at index 0
   const accuracy = totalAnswered > 0 ? Math.round((correctCount / totalAnswered) * 100) : 0;
 
   const question = questions[currentIndex];
@@ -131,7 +132,7 @@ export default function TestPage() {
     if (isTestComplete && !actionData?.success) {
       const formData = new FormData();
       formData.append('intent', 'complete-test');
-      formData.append('correctCount', correctCount.toString());
+      formData.append('correctCount', answerMask.toString());
       formData.append('timeElapsed', timeElapsed.toString());
       submit(formData, { method: 'post' });
     }
@@ -162,7 +163,11 @@ export default function TestPage() {
     setSubmitted(true);
     const isCorrect = selected === question.answerIndex;
     setResult(isCorrect ? 'correct' : 'incorrect');
-    setAnswers((prev) => [...prev, isCorrect]);
+
+    // Update the bitmask for this answer
+    if (isCorrect) {
+      setAnswerMask((prev) => prev | (1 << currentIndex));
+    }
 
     // Move to next question or complete test after a delay
     setTimeout(() => {
@@ -187,6 +192,12 @@ export default function TestPage() {
       setResult('none');
       setError('');
     } else {
+      // Submit the results when last question is answered
+      const formData = new FormData();
+      formData.append('intent', 'complete-test');
+      formData.append('correctCount', answerMask.toString());
+      formData.append('timeElapsed', timeElapsed.toString());
+      submit(formData, { method: 'post' });
       setIsTestComplete(true);
     }
   };
