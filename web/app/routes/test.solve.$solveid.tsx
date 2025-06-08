@@ -1,4 +1,5 @@
-import { Link } from '@remix-run/react';
+import { useLoaderData } from '@remix-run/react';
+import createLoader from 'app/utils/createLoader';
 import { useState } from 'react';
 
 type Question = {
@@ -50,7 +51,21 @@ const questions: Question[] = [
   },
 ];
 
+export const loader = createLoader(async ({ db, params }) => {
+  const solveId = params.solveid;
+
+  const testSolve = await db.testSolve.findUnique({
+    where: {
+      id: Number(solveId),
+    },
+  });
+
+  return { testSolve };
+});
+
 export default function TestPage() {
+  const { testSolve } = useLoaderData<typeof loader>();
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -84,13 +99,22 @@ export default function TestPage() {
   };
 
   return (
-    <>
-      <div className="p-6 max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">뉴스 기사 테스트 문제</h1>
-
-        <section className="bg-white rounded-lg shadow p-6">
+    <div className="flex grow-1 md:flex-row flex-col">
+      <div className="grow-1 h-auto border border-gray-300 rounded flex flex-col">
+        <p className="bg-amber-100 p-1 px-2">기사를 읽고 문제에 답해주세요.</p>
+        <iframe
+          className="w-full grow-1"
+          src={
+            testSolve?.testType === 'A'
+              ? 'https://graphed-news.pages.dev/article/4'
+              : 'https://www.newsis.com/view/NISX20250602_0003199154'
+          }
+        />
+      </div>
+      <div className="max-w-xl md:sticky md:bottom-0">
+        <section className="bg-white p-3">
           {/* 상단 타이틀 + 결과 메시지 위치 */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between">
             <div className="text-xl font-semibold">
               <span className="text-gray-500 font-bold mr-4">문제 {currentIndex + 1}</span>
               {question.title}
@@ -150,7 +174,6 @@ export default function TestPage() {
           </form>
         </section>
       </div>
-      <iframe src="https://graphed-news.pages.dev/article/4" className="w-full h-200" />
-    </>
+    </div>
   );
 }
