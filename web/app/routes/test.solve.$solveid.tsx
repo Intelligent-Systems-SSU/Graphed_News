@@ -2,6 +2,7 @@ import { useLoaderData, useActionData, useSubmit, useNavigation } from '@remix-r
 import { useNoNavigation } from 'app/components/Navigation';
 import createLoader from 'app/utils/createLoader';
 import createAction from 'app/utils/createAction';
+import { getPrismaClient } from 'app/utils/prisma';
 import { useState, useEffect, useRef } from 'react';
 
 type Question = {
@@ -76,14 +77,17 @@ export const action = createAction(async ({ db, request, params }) => {
   return null;
 });
 
-export const loader = createLoader(async ({ db, params }) => {
-  const solveId = params.solveid;
-
-  const testSolve = await db.testSolve.findUnique({
+const fetchTestSolve = async (db: ReturnType<typeof getPrismaClient>, solveId: string) => {
+  return await db.testSolve.findUnique({
     where: {
       id: Number(solveId),
     },
   });
+};
+
+export const loader = createLoader(async ({ db, params }) => {
+  const solveId = params.solveid!;
+  const testSolve = await fetchTestSolve(db, solveId);
 
   return { testSolve };
 });
