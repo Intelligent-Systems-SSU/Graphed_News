@@ -75,7 +75,7 @@ def main():
     """
     parser = argparse.ArgumentParser(description="News article crawler and enhancer with POST")
     parser.add_argument("--url", type=str, help="URL of the news article to process",
-                        default="https://n.news.naver.com/mnews/article/028/0002746694")
+                        default="https://n.news.naver.com/mnews/article/016/0001843132?sid=105")
     parser.add_argument("--news-id", type=str, help="News ID for the POST request", required=False)
     args = parser.parse_args()
     

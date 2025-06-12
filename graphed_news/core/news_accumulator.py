@@ -112,7 +112,7 @@ class NewsAccumulator:
 #### 요약 및 제언
 {report.summary_recommendations}
 
-#### 질의응답 통찰
+#### TMI
 {report.qa_insights}
     """
 
